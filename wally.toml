@@ -8,3 +8,13 @@ registry = "https://github.com/upliftgames/wally-index"
 exclude = ["Packages", ".vscode"]
 
 [dependencies]
+error = "nightcycle/error@^0"
+future = "nightcycle/future@^0"
+result = "nightcycle/result@^0"
+option = "nightcycle/option@^0"
+hash-map = "nightcycle/hash-map@^0"
+vec-deque = "nightcycle/vec-deque@^0"
+vec = "nightcycle/vec@^0"
+lune-util = "nightcycle/lune-util@^0"
+serde-json = "nightcycle/serde-json@^0"
+reqwest = "nightcycle/reqwest@^0"

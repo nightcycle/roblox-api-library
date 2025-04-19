@@ -4,12 +4,13 @@ types
 lints
 build
 serve
+node_modules
+stage-src
 
 # Files
 sourcemap.json
 darklua-sourcemap.json
 wally.lock
-package-lock.json
 keys.txt
 
 # File types

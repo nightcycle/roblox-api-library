@@ -21,6 +21,8 @@
 		"*.rbxl": true,
 		"*.blend": true,
 		"*.blend1": true,
+		"stage-src": true,
+		"node_modules": true,
 		"build": true,
 		"default.project.json": true,
 		"darklua-sourcemap.json": true,
@@ -33,5 +35,8 @@
 	"stylua.targetReleaseVersion": "latest",
 	"[luau]": {
 		"editor.defaultFormatter": "JohnnyMorganz.stylua"
-	}
+	},
+	"secrets.enabledFolders": [
+		"rbx-web-api-library"
+	]
 }

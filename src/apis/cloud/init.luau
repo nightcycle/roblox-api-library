@@ -2,8 +2,8 @@
 -- Services
 -- Packages
 -- Modules
-local apis = require("./apis")
-local develop = require("./develop")
+local v1 = require("./v1")
+local v2 = require("./v2")
 -- Types
 -- Constants
 -- Variables
@@ -11,6 +11,6 @@ local develop = require("./develop")
 -- Private Functions
 -- Class
 return {
-	apis = apis,
-	develop = develop,
+	v1 = v1,
+	v2 = v2,
 }
