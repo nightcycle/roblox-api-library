@@ -3,6 +3,7 @@
 -- Packages
 -- Modules
 local universes = require("./universes")
+local messagingService = require("./messagingService")
 -- Types
 -- Constants
 -- Variables
@@ -10,5 +11,6 @@ local universes = require("./universes")
 -- Private Functions
 -- Class
 return {
+	messagingService = messagingService,
 	universes = universes,
 }

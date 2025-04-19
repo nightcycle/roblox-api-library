@@ -5,6 +5,7 @@ local fs = require("@lune/fs")
 local luneUtil = require("@pkg/@nightcycle/lune-util")
 local err = require("@pkg/@nightcycle/error")
 local option = require("@pkg/@nightcycle/option")
+local reqwest = require("@pkg/@nightcycle/reqwest")
 -- Modules
 local src = require("../src")
 -- Types
@@ -25,6 +26,8 @@ print(
 			.post(UNIVERSE_ID, PLACE_ID, "Saved", place)
 			:await()
 			:unwrap()
+			:json()
+			:unwrap()
 	)}`
 )
 print(
@@ -33,25 +36,27 @@ print(
 			.post(UNIVERSE_ID, PLACE_ID, "Published", place)
 			:await()
 			:unwrap()
+			:json()
+			:unwrap()
 	)}`
 )
 
 do
 	local intentionalError =
 		src.apis.cloud.v1.universes.places.versions.post(UNIVERSE_ID, 1, "Saved", place):await():unwrapErr()
-	print(`intentional error for bad place id: {err.displayAsJson(intentionalError)}`)
+	print(`intentional error for bad place id: {err.displayAsJson(intentionalError:json():unwrap())}`)
 	assert(
-		intentionalError.code == "InvalidRequest",
-		`Expected code="InvalidRequest", received {intentionalError.code}`
+		intentionalError:status() == reqwest.Response.ERROR_CODES.BAD_REQUEST,
+		`Expected status={reqwest.Response.ERROR_CODES.BAD_REQUEST}, received {intentionalError:status()}`
 	)
 end
 do
 	local intentionalError =
 		src.apis.cloud.v1.universes.places.versions.post(1, PLACE_ID, "Saved", place):await():unwrapErr()
-	print(`intentional error for bad universe id: {err.displayAsJson(intentionalError)}`)
+	print(`intentional error for bad universe id: {err.displayAsJson(intentionalError:json():unwrap())}`)
 	assert(
-		intentionalError.code == "InvalidRequest",
-		`Expected code="InvalidRequest", received {intentionalError.code}`
+		intentionalError:status() == reqwest.Response.ERROR_CODES.BAD_REQUEST,
+		`Expected status={reqwest.Response.ERROR_CODES.BAD_REQUEST}, received {intentionalError:status()}`
 	)
 end
 do
@@ -61,10 +66,10 @@ do
 		.post(UNIVERSE_ID, PLACE_ID, "Saved", place)
 		:await()
 		:unwrapErr()
-	print(`intentional error for bad universe id: {err.displayAsJson(intentionalError)}`)
+	print(`intentional error for bad authorization: {err.displayAsJson(intentionalError:json():unwrap())}`)
 	assert(
-		intentionalError.code == "Unauthorized",
-		`Expected code="Unauthorized", received {intentionalError.code}`
+		intentionalError:status() == reqwest.Response.ERROR_CODES.UNAUTHORIZED,
+		`Expected status={reqwest.Response.ERROR_CODES.UNAUTHORIZED}, received {intentionalError:status()}`
 	)
 	luneUtil.Env["RBX_OPEN_CLOUD_API_KEY"] = priorKey
 end
@@ -72,10 +77,16 @@ end
 for i = 1, 100 do
 	local intentionalError =
 		src.apis.cloud.v1.universes.places.versions.post(1, PLACE_ID, "Saved", place):await():unwrapErr()
-	if intentionalError.code == "TooManyRequests" then
+	if intentionalError:status() == reqwest.Response.ERROR_CODES.TOO_MANY_REQUESTS then
 		print(
-			`intentional error on attempt #{i} for too-many-requests: {err.displayAsJson(intentionalError)}`
+			`intentional error on attempt #{i} for too-many-requests: {err.displayAsJson(
+				intentionalError:json():unwrap()
+			)}`
 		)
 		break
+	elseif intentionalError:status() ~= reqwest.Response.ERROR_CODES.BAD_REQUEST then
+		error(
+			`Expected status={reqwest.Response.ERROR_CODES.BAD_REQUEST}, received {intentionalError:status()}`
+		)
 	end
 end

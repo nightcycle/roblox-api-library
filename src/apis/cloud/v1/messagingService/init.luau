@@ -9,9 +9,9 @@ local vecDeque = require("@pkg/@nightcycle/vec-deque")
 local err = require("@pkg/@nightcycle/error")
 local reqwest = require("@pkg/@nightcycle/reqwest")
 -- Modules
-local client = require("../../../../../../client")
+local client = require("../../../../client")
 -- Constants
-local CONSTANTS = require("../../../../../../CONSTANTS")
+local CONSTANTS = require("../../../../CONSTANTS")
 -- Types
 type Result<V, E> = result.Result<V, E>
 type Option<V> = option.Option<V>
@@ -31,34 +31,41 @@ local Util = {}
 
 function Util.post(
 	universeId: number,
-	placeId: number,
-	versionType: "Saved" | "Published",
-	data: buffer | string
-): Future<Result<Response<{
-	versionNumber: number,
-}>, Response<{
-	code: string,
-	message: string,
-} | {
-	errors: { { code: number, message: string } },
-}>>>
+	topic: string,
+	message: string
+): Future<
+	Result<
+		Response<string>,
+		Response<
+			{
+				Error: "InvalidRequest"
+					| "Unauthorized"
+					| "Forbidden"
+					| "InternalServerError"
+					| "UnknownError"
+					| "TooManyRequests",
+				Message: string,
+			}
+			| { errors: { { code: number, message: string } } }
+			| string
+		>
+	>
+>
 	return future.from(function(): any
 		return client
 			.fromAPIKey()
 			:post(
 				reqwest.Url
-					.tryFrom(CONSTANTS.OPEN_CLOUD_BASE_URL .. `/universes/v1/{universeId}/places/{placeId}/versions`)
+					.tryFrom(
+						CONSTANTS.OPEN_CLOUD_BASE_URL
+							.. `/messaging-service/v1/universes/{universeId}/topics/{topic}`
+					)
 					:unwrap()
-					:query(hashMap.from({
-						versionType = versionType,
-					}))
 			)
-			:body(
-				reqwest.Body.fromOctetStream(
-					if typeof(data) == "string" then buffer.fromstring(data) else data
-				)
-			)
-			:header("Content-Type", "application/octet-stream")
+			:body(reqwest.Body.fromJson({
+				message = message,
+			}))
+			:header("Content-Type", "application/json")
 			:build()
 			:send()
 			:await()
