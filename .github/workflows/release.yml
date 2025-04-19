@@ -55,6 +55,9 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: set-up lune
+        run: lune setup
+
       - name: install wally packages
         run: sh scripts/wally-install.sh "dev.project.json"
 
@@ -101,6 +104,9 @@ jobs:
       - uses: ok-nick/setup-aftman@v0.4.2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: set-up lune
+        run: lune setup
 
       - name: Update version and labels
         shell: bash

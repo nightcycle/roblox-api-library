@@ -5,6 +5,7 @@
 		"*": true
 	},
 	"aliases": {
-		"pkg": "node_modules/.luau-aliases"
+		"pkg": "node_modules/.luau-aliases",
+		"lune": "~/.lune/.typedefs/0.8.9/"
 	}
 }

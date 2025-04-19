@@ -25,6 +25,9 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: set-up lune
+        run: lune setup
+
       - name: install wally
         run: sh scripts/wally-install.sh "${{env.ROJO_CONFIG}}"
 
