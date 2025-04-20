@@ -9,9 +9,9 @@ local vecDeque = require("@pkg/@nightcycle/vec-deque")
 local err = require("@pkg/@nightcycle/error")
 local reqwest = require("@pkg/@nightcycle/reqwest")
 -- Modules
-local client = require("../../../../../../client")
+local client = require("../../../../../client")
 -- Constants
-local CONSTANTS = require("../../../../../../CONSTANTS")
+local CONSTANTS = require("../../../../../CONSTANTS")
 -- Types
 type Result<V, E> = result.Result<V, E>
 type Option<V> = option.Option<V>
@@ -39,8 +39,6 @@ function Util.post(
 }>, Response<{
 	code: string,
 	message: string,
-} | {
-	errors: { { code: number, message: string } },
 }>>>
 	return future.from(function(): any
 		return client
@@ -62,6 +60,29 @@ function Util.post(
 			:build()
 			:send()
 			:await()
+			:match(function(ok)
+				return result.ok(ok)
+			end, function(e)
+				if e["errors"] then
+					local eCount = #e["errors"]
+					if eCount == 1 then
+						local e2 = e["errors"][1]
+						return result.err({
+							code = "UnknownError",
+							message = e2["message"],
+						})
+					end
+				elseif typeof(e["code"]) == "string" and typeof(e["message"]) == "string" then
+					return result.err({
+						code = e["code"],
+						message = e["message"],
+					})
+				end
+				return result.err({
+					code = "UnknownError",
+					message = err.displayAsJson(e["errors"]),
+				})
+			end)
 	end)
 end
 

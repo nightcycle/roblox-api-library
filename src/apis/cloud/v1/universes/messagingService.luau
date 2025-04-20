@@ -36,19 +36,10 @@ function Util.post(
 ): Future<
 	Result<
 		Response<string>,
-		Response<
-			{
-				Error: "InvalidRequest"
-					| "Unauthorized"
-					| "Forbidden"
-					| "InternalServerError"
-					| "UnknownError"
-					| "TooManyRequests",
-				Message: string,
-			}
-			| { errors: { { code: number, message: string } } }
-			| string
-		>
+		Response<{
+			code: "InvalidRequest" | "Unauthorized" | "Forbidden" | "InternalServerError" | "UnknownError" | "TooManyRequests",
+			message: string,
+		}>
 	>
 >
 	return future.from(function(): any
@@ -69,6 +60,45 @@ function Util.post(
 			:build()
 			:send()
 			:await()
+			:match(function(ok)
+				return result.ok(ok)
+			end, function(eResponse)
+				local eBuilder = eResponse:builder()
+				return eResponse:json():match(function(e)
+					if e["errors"] then
+						local eCount = #e["errors"]
+						if eCount == 1 then
+							local e2 = e["errors"][1]
+							return result.err(eBuilder
+								:body(reqwest.Body.fromJson({
+									code = "UnknownError",
+									message = e2["message"],
+								}))
+								:build())
+						end
+					elseif typeof(e["code"]) == "string" and typeof(e["message"]) == "string" then
+						return result.err(eBuilder
+							:body(reqwest.Body.fromJson({
+								code = e["code"],
+								message = e["message"],
+							}))
+							:build())
+					end
+					return result.err(eBuilder
+						:body(reqwest.Body.fromJson({
+							code = "UnknownError",
+							message = err.displayAsJson(e["errors"]) :: any,
+						}))
+						:build())
+				end, function(e)
+					return result.err(eBuilder
+						:body(reqwest.Body.fromJson({
+							code = "UnknownError",
+							message = err.displayAsJson(e :: any),
+						}))
+						:build())
+				end)
+			end)
 	end)
 end
 

@@ -2,8 +2,7 @@
 -- Services
 -- Packages
 -- Modules
-local universes = require("./universes")
-
+local entries = require("./entries")
 -- Types
 -- Constants
 -- Variables
@@ -11,5 +10,5 @@ local universes = require("./universes")
 -- Private Functions
 -- Class
 return {
-	universes = universes,
+	entries = entries,
 }

@@ -2,6 +2,19 @@
 
 set -e
 
+npm cache clean --force
+# remove the lock file
+if [ -f package-lock.json ]; then
+	echo "removing package-lock.json"
+	rm -f package-lock.json
+fi
+
+# remove node_modules
+if [ -d node_modules ]; then
+	echo "removing node_modules"
+	rm -rf node_modules
+fi
+
 # if [ ! -d node_modules ]; then
 npm install
 # fi

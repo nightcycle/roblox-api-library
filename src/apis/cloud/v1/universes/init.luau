@@ -3,6 +3,8 @@
 -- Packages
 -- Modules
 local places = require("./places")
+local messagingService = require("./messagingService")
+local standardDatastores = require("./standardDatastores")
 -- Types
 -- Constants
 -- Variables
@@ -11,4 +13,6 @@ local places = require("./places")
 -- Class
 return {
 	places = places,
+	messagingService = messagingService,
+	standardDatastores = standardDatastores,
 }
