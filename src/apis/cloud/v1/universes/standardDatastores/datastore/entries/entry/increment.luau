@@ -11,10 +11,10 @@ local reqwest = require("@pkg/@nightcycle/reqwest")
 local luneUtil = require("@pkg/@nightcycle/lune-util")
 
 -- Modules
-local client = require("../../../../../../../client")
+local client = require("../../../../../../../../client")
 
 -- Constants
-local CONSTANTS = require("../../../../../../../CONSTANTS")
+local CONSTANTS = require("../../../../../../../../CONSTANTS")
 
 -- Types
 type Result<V, E> = result.Result<V, E>
@@ -40,89 +40,12 @@ type DataStoreEntryValue =
 local Util = {}
 
 -- lists the datastores
-function Util.get(
-	universeId: number,
-	datastoreName: string,
-	entryKey: string,
-	scope: Option<string>
-): Future<
-	Result<
-		Response<DataStoreEntryValue>,
-		Response<{
-			code: "InvalidRequest" | "Unauthorized" | "Forbidden" | "InternalServerError" | "UnknownError" | "TooManyRequests",
-			message: string,
-		}>
-	>
->
-	return future.from(function(): any
-		return client
-			.fromAPIKey()
-			:get(
-				reqwest.Url
-					.tryFrom(
-						CONSTANTS.OPEN_CLOUD_BASE_URL
-							.. `/datastores/v1/universes/{universeId}/standard-datastores/datastore/entries/entry`
-					)
-					:unwrap()
-					:query(hashMap.from({
-						datastoreName = datastoreName,
-						entryKey = entryKey,
-						scope = scope:unwrapOr("global"),
-					}))
-			)
-			:header("Content-Type", "application/x-www-form-urlencoded")
-			:build()
-			:send()
-			:await()
-			:match(function(ok)
-				return result.ok(ok)
-			end, function(eResponse)
-				local eBuilder = eResponse:builder()
-				return eResponse:json():match(function(e)
-					if e["errors"] then
-						local eCount = #e["errors"]
-						if eCount == 1 then
-							local e2 = e["errors"][1]
-							return result.err(eBuilder
-								:body(reqwest.Body.fromJson({
-									code = "UnknownError",
-									message = e2["message"],
-								}))
-								:build())
-						end
-					elseif typeof(e["code"]) == "string" and typeof(e["message"]) == "string" then
-						return result.err(eBuilder
-							:body(reqwest.Body.fromJson({
-								code = e["code"],
-								message = e["message"],
-							}))
-							:build())
-					end
-					return result.err(eBuilder
-						:body(reqwest.Body.fromJson({
-							code = "UnknownError",
-							message = err.displayAsJson(e["errors"]) :: any,
-						}))
-						:build())
-				end, function(e)
-					return result.err(eBuilder
-						:body(reqwest.Body.fromJson({
-							code = "UnknownError",
-							message = err.displayAsJson(e :: any),
-						}))
-						:build())
-				end)
-			end)
-	end)
-end
-
 function Util.post(
 	universeId: number,
 	datastoreName: string,
 	entryKey: string,
-	value: DataStoreEntryValue,
+	delta: number,
 	scope: Option<string>,
-	matchVersion: Option<string>,
 	exclusiveCreate: Option<boolean>,
 	robloxEntryAttributes: Option<HashMap<string, boolean | number | string>>,
 	robloxEntryUserIds: Option<Vec<number>>
@@ -148,26 +71,18 @@ function Util.post(
 				reqwest.Url
 					.tryFrom(
 						CONSTANTS.OPEN_CLOUD_BASE_URL
-							.. `/datastores/v1/universes/{universeId}/standard-datastores/datastore/entries/entry`
+							.. `/datastores/v1/universes/{universeId}/standard-datastores/datastore/entries/entry/increment`
 					)
 					:unwrap()
 					:query(hashMap.from({
 						datastoreName = datastoreName,
 						entryKey = entryKey,
 						scope = scope:unwrapOr("global"),
-						matchVersion = matchVersion:asNullable(),
 						exclusiveCreate = exclusiveCreate:asNullable(),
+						incrementBy = delta,
 					}))
 			)
 			:header("Content-Type", "application/json")
-			:body(
-				if typeof(value) == "string"
-					then reqwest.Body.fromText('"' .. value:gsub('"', '\\"') .. '"')
-					elseif typeof(value) == "boolean" or typeof(value) == "number" then reqwest.Body.fromText(
-						tostring(value)
-					)
-					else reqwest.Body.fromJson(value)
-			)
 
 		baseRequest = robloxEntryAttributes:match(
 			function(attributes: HashMap<string, boolean | number | string>)
@@ -208,7 +123,7 @@ function Util.post(
 							:body(reqwest.Body.fromJson({
 								code = "UnknownError",
 								message = e2["message"],
-							}))
+							}) :: reqwest.Body<any>)
 							:build())
 					end
 				elseif typeof(e["code"]) == "string" and typeof(e["message"]) == "string" then
