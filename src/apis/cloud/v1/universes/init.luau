@@ -5,6 +5,7 @@
 local places = require("./places")
 local messagingService = require("./messagingService")
 local standardDatastores = require("./standardDatastores")
+local orderedDatastores = require("./orderedDatastores")
 -- Types
 -- Constants
 -- Variables
@@ -15,4 +16,5 @@ return {
 	places = places,
 	messagingService = messagingService,
 	standardDatastores = standardDatastores,
+	orderedDatastores = orderedDatastores,
 }
