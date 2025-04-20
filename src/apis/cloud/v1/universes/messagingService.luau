@@ -33,15 +33,10 @@ function Util.post(
 	universeId: number,
 	topic: string,
 	message: string
-): Future<
-	Result<
-		Response<string>,
-		Response<{
-			code: "InvalidRequest" | "Unauthorized" | "Forbidden" | "InternalServerError" | "UnknownError" | "TooManyRequests",
-			message: string,
-		}>
-	>
->
+): Future<Result<Response<string>, Response<{
+	code: string,
+	message: string,
+}>>>
 	return future.from(function(): any
 		return client
 			.fromAPIKey()

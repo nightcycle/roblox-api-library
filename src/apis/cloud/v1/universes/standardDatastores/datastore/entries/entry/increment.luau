@@ -5,7 +5,6 @@ local option = require("@pkg/@nightcycle/option")
 local future = require("@pkg/@nightcycle/future")
 local hashMap = require("@pkg/@nightcycle/hash-map")
 local vec = require("@pkg/@nightcycle/vec")
-local vecDeque = require("@pkg/@nightcycle/vec-deque")
 local err = require("@pkg/@nightcycle/error")
 local reqwest = require("@pkg/@nightcycle/reqwest")
 local luneUtil = require("@pkg/@nightcycle/lune-util")
@@ -24,10 +23,8 @@ type HashMap<K, V> = hashMap.HashMap<K, V>
 type MutHashMap<K, V> = hashMap.MutHashMap<K, V>
 type Vec<V> = vec.Vec<V>
 type MutVec<V> = vec.MutVec<V>
-type VecDeque<V> = vecDeque.VecDeque<V>
 type Error<V, B> = err.Error<V, B>
 type Response<B> = reqwest.Response<B>
-type CompatDateTime = luneUtil.CompatDateTime
 type DataStoreEntryValue =
 	boolean
 	| number
@@ -49,21 +46,12 @@ function Util.post(
 	exclusiveCreate: Option<boolean>,
 	robloxEntryAttributes: Option<HashMap<string, boolean | number | string>>,
 	robloxEntryUserIds: Option<Vec<number>>
-): Future<
-	Result<
-		Response<{
-			version: string,
-			deleted: boolean,
-			contentLength: number,
-			createdTime: string,
-			objectCreatedTime: string,
-		}>,
-		Response<{
-			code: "InvalidRequest" | "Unauthorized" | "Forbidden" | "InternalServerError" | "UnknownError" | "TooManyRequests",
-			message: string,
-		}>
-	>
->
+): Future<Result<Response<{
+	sum: number,
+}>, Response<{
+	code: string,
+	message: string,
+}>>>
 	return future.from(function(): any
 		local baseRequest = client
 			.fromAPIKey()
@@ -111,7 +99,14 @@ function Util.post(
 		end)
 
 		return baseRequest:build():send():await():match(function(ok)
-			return result.ok(ok)
+			local txt = ok:text():expect("Failed to parse response as text")
+			local num = tonumber(txt)
+			assert(num, `Failed to parse response as number: "{txt}"`)
+			return result.ok(ok:builder()
+				:body(reqwest.Body.fromJson({
+					sum = num,
+				}))
+				:build())
 		end, function(eResponse)
 			local eBuilder = eResponse:builder()
 			return eResponse:json():match(function(e)

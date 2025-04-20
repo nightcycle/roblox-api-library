@@ -4,31 +4,20 @@ local result = require("@pkg/@nightcycle/result")
 local option = require("@pkg/@nightcycle/option")
 local future = require("@pkg/@nightcycle/future")
 local hashMap = require("@pkg/@nightcycle/hash-map")
-local vec = require("@pkg/@nightcycle/vec")
-local vecDeque = require("@pkg/@nightcycle/vec-deque")
 local err = require("@pkg/@nightcycle/error")
 local reqwest = require("@pkg/@nightcycle/reqwest")
-local luneUtil = require("@pkg/@nightcycle/lune-util")
 
 -- Modules
-local client = require("../../../../../../../client")
-local entry = require("./entry")
+local client = require("../../../../../../../../../client")
 
 -- Constants
-local CONSTANTS = require("../../../../../../../CONSTANTS")
+local CONSTANTS = require("../../../../../../../../../CONSTANTS")
 
 -- Types
 type Result<V, E> = result.Result<V, E>
 type Option<V> = option.Option<V>
 type Future<V> = future.Future<V>
-type HashMap<K, V> = hashMap.HashMap<K, V>
-type MutHashMap<K, V> = hashMap.MutHashMap<K, V>
-type Vec<V> = vec.Vec<V>
-type MutVec<V> = vec.MutVec<V>
-type VecDeque<V> = vecDeque.VecDeque<V>
-type Error<V, B> = err.Error<V, B>
 type Response<B> = reqwest.Response<B>
-type CompatDateTime = luneUtil.CompatDateTime
 type DataStoreEntryValue =
 	boolean
 	| number
@@ -39,22 +28,16 @@ type DataStoreEntryValue =
 
 -- Class
 local Util = {}
-Util.entry = entry
 
--- lists the entries
+-- lists the datastores
 function Util.get(
 	universeId: number,
 	datastoreName: string,
-	allScopes: Option<boolean>,
-	scope: Option<string>,
-	cursor: Option<string>,
-	limit: Option<number>,
-	prefix: Option<string>
-): Future<Result<Response<{
-	keys: { { key: string } },
-	nextPageCursor: string,
-}>, Response<{
-	code: string | "JsonDecodeError",
+	entryKey: string,
+	versionId: string,
+	scope: Option<string>
+): Future<Result<Response<DataStoreEntryValue>, Response<{
+	code: string,
 	message: string,
 }>>>
 	return future.from(function(): any
@@ -64,38 +47,22 @@ function Util.get(
 				reqwest.Url
 					.tryFrom(
 						CONSTANTS.OPEN_CLOUD_BASE_URL
-							.. `/datastores/v1/universes/{universeId}/standard-datastores/datastore/entries`
+							.. `/datastores/v1/universes/{universeId}/standard-datastores/datastore/entries/entry/versions/version`
 					)
 					:unwrap()
 					:query(hashMap.from({
 						datastoreName = datastoreName,
-						cursor = cursor:asNullable(),
-						limit = limit:asNullable(),
-						prefix = prefix:asNullable(),
-						allScopes = allScopes:asNullable(),
+						entryKey = entryKey,
 						scope = scope:unwrapOr("global"),
+						versionId = versionId,
 					}))
 			)
+			:header("Content-Type", "application/json")
 			:build()
 			:send()
 			:await()
 			:match(function(ok)
-				return ok:json():match(function(json)
-					-- print(`typeof: {typeof(json)}`)
-					return result.ok(ok:builder()
-						:body(reqwest.Body.fromJson({
-							keys = json["keys"],
-							nextPageCursor = json["nextPageCursor"] or "",
-						}))
-						:build())
-				end, function(e)
-					return result.err(ok:builder()
-						:body(reqwest.Body.fromJson({
-							code = "JsonDecodeError",
-							message = err.displayAsJson(e),
-						}))
-						:build())
-				end)
+				return result.ok(ok)
 			end, function(eResponse)
 				local eBuilder = eResponse:builder()
 				return eResponse:json():match(function(e)
@@ -107,7 +74,7 @@ function Util.get(
 								:body(reqwest.Body.fromJson({
 									code = "UnknownError",
 									message = e2["message"],
-								}))
+								}) :: reqwest.Body<any>)
 								:build())
 						end
 					elseif typeof(e["code"]) == "string" and typeof(e["message"]) == "string" then

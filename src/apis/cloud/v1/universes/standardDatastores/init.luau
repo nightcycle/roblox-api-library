@@ -46,15 +46,10 @@ function Util.get(
 	cursor: Option<string>,
 	limit: Option<number>,
 	prefix: Option<string>
-): Future<
-	Result<
-		Response<OkBody>,
-		Response<{
-			code: "InvalidRequest" | "Unauthorized" | "Forbidden" | "InternalServerError" | "UnknownError" | "TooManyRequests",
-			message: string,
-		}>
-	>
->
+): Future<Result<Response<OkBody>, Response<{
+	code: string,
+	message: string,
+}>>>
 	return future.from(function(): any
 		return client
 			.fromAPIKey()
