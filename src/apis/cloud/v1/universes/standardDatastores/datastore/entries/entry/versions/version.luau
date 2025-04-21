@@ -88,7 +88,7 @@ function Util.get(
 					return result.err(eBuilder
 						:body(reqwest.Body.fromJson({
 							code = "UnknownError",
-							message = err.displayAsJson(e["errors"]) :: any,
+							message = err.displayAsJson(e) :: any,
 						}))
 						:build())
 				end, function(e)

@@ -8,10 +8,13 @@ local vec = require("@pkg/@nightcycle/vec")
 local vecDeque = require("@pkg/@nightcycle/vec-deque")
 local err = require("@pkg/@nightcycle/error")
 local reqwest = require("@pkg/@nightcycle/reqwest")
+local luneUtil = require("@pkg/@nightcycle/lune-util")
 -- Modules
-local client = require("../../../../../client")
+local client = require("../../../../client")
+local operations = require("./operations")
+local asset = require("./asset")
 -- Constants
-local CONSTANTS = require("../../../../../CONSTANTS")
+local CONSTANTS = require("../../../../CONSTANTS")
 -- Types
 type Result<V, E> = result.Result<V, E>
 type Option<V> = option.Option<V>
@@ -28,35 +31,59 @@ type Response<B> = reqwest.Response<B>
 
 -- Class
 local Util = {}
+Util.operations = operations
+Util.asset = asset
 
 function Util.post(
-	universeId: number,
-	placeId: number,
-	versionType: "Saved" | "Published",
+	assetType: operations.AssetType,
+	contentType: operations.ContentType,
+	displayName: string,
+	description: string,
+	creatorType: operations.CreatorType,
+	creatorId: number,
 	data: buffer | string
-): Future<Result<Response<{
-	versionNumber: number,
-}>, Response<{
+): Future<Result<Response<operations.OperationData>, Response<{
 	code: string,
 	message: string,
 }>>>
+	local fileExt = contentType:split("/")[2]
+	assert(fileExt, "Invalid content type")
+	local body = reqwest.Body.fromForm(
+		hashMap.from({
+			request = luneUtil.Net.jsonEncode({
+				assetType = assetType,
+				displayName = displayName,
+				description = description,
+				creationContext = if creatorType == "User"
+					then {
+						creator = {
+							userId = tostring(creatorId),
+						},
+					}
+					else {
+						creator = {
+							groupId = tostring(creatorId),
+						},
+					},
+			}),
+		}),
+		hashMap.from({
+			fileContent = {
+				fileName = `file.{fileExt}`,
+				contentType = contentType,
+				data = data,
+			},
+		}),
+		option.none()
+	)
+	local form = body:asForm():unwrap()
+
 	return future.from(function(): any
 		return client
 			.fromAPIKey()
-			:post(
-				reqwest.Url
-					.tryFrom(CONSTANTS.OPEN_CLOUD_BASE_URL .. `/universes/v1/{universeId}/places/{placeId}/versions`)
-					:unwrap()
-					:query(hashMap.from({
-						versionType = versionType,
-					}))
-			)
-			:body(
-				reqwest.Body.fromOctetStream(
-					if typeof(data) == "string" then buffer.fromstring(data) else data
-				)
-			)
-			:header("Content-Type", "application/octet-stream")
+			:post(reqwest.Url.tryFrom(CONSTANTS.OPEN_CLOUD_BASE_URL .. `/assets/v1/assets`):unwrap())
+			:body(body)
+			:header("Content-Type", `multipart/form-data; boundary={form.boundary}`)
 			:build()
 			:send()
 			:await()

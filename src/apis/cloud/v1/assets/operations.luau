@@ -9,9 +9,9 @@ local vecDeque = require("@pkg/@nightcycle/vec-deque")
 local err = require("@pkg/@nightcycle/error")
 local reqwest = require("@pkg/@nightcycle/reqwest")
 -- Modules
-local client = require("../../../../../client")
+local client = require("../../../../client")
 -- Constants
-local CONSTANTS = require("../../../../../CONSTANTS")
+local CONSTANTS = require("../../../../CONSTANTS")
 -- Types
 type Result<V, E> = result.Result<V, E>
 type Option<V> = option.Option<V>
@@ -24,39 +24,82 @@ type VecDeque<V> = vecDeque.VecDeque<V>
 type Error<V, B> = err.Error<V, B>
 type Response<B> = reqwest.Response<B>
 
+export type AssetType = "Model" | "Decal" | "Audio" | "Video"
+export type CreatorType = "User" | "Group"
+export type ContentType =
+	"model/fbx"
+	| "image/png"
+	| "image/jpeg"
+	| "image/bmp"
+	| "image/tga"
+	| "audio/mpeg"
+	| "audio/ogg"
+	| "video/mp4"
+	| "video/mov"
+export type SocialData = {
+	title: string,
+	uri: string?,
+}
+export type PreviewData = {
+	asset: string,
+	altText: string?,
+}
+export type OperationData = {
+	path: string,
+	done: false,
+	metadata: unknown?,
+	operationId: string,
+} | {
+	path: string,
+	done: true,
+	operationId: string,
+	metadata: unknown?,
+	response: {
+		["@type"]: string,
+		path: string,
+		revisionCreateTime: string,
+		revisionId: string,
+		assetType: AssetType,
+		displayName: string,
+		state: "Active" | string,
+		assetId: string,
+		moderationResult: {
+			moderationState: "Approved" | string,
+		},
+		creationContext: {
+			creator: {
+				groupId: string,
+			} | {
+				userId: string,
+			},
+			description: string,
+		},
+	},
+} | {
+	path: string,
+	done: true,
+	operationId: string,
+	metadata: unknown?,
+	error: unknown,
+}
+
 -- Private Functions
 
 -- Class
 local Util = {}
 
-function Util.post(
-	universeId: number,
-	placeId: number,
-	versionType: "Saved" | "Published",
-	data: buffer | string
-): Future<Result<Response<{
-	versionNumber: number,
-}>, Response<{
+function Util.get(operationId: string): Future<Result<Response<OperationData>, Response<{
 	code: string,
 	message: string,
 }>>>
 	return future.from(function(): any
 		return client
 			.fromAPIKey()
-			:post(
+			:get(
 				reqwest.Url
-					.tryFrom(CONSTANTS.OPEN_CLOUD_BASE_URL .. `/universes/v1/{universeId}/places/{placeId}/versions`)
+					.tryFrom(CONSTANTS.OPEN_CLOUD_BASE_URL .. `/assets/v1/operations/{operationId}`)
 					:unwrap()
-					:query(hashMap.from({
-						versionType = versionType,
-					}))
 			)
-			:body(
-				reqwest.Body.fromOctetStream(
-					if typeof(data) == "string" then buffer.fromstring(data) else data
-				)
-			)
-			:header("Content-Type", "application/octet-stream")
 			:build()
 			:send()
 			:await()

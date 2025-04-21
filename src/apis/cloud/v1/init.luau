@@ -3,7 +3,7 @@
 -- Packages
 -- Modules
 local universes = require("./universes")
-
+local assets = require("./assets")
 -- Types
 -- Constants
 -- Variables
@@ -12,4 +12,5 @@ local universes = require("./universes")
 -- Class
 return {
 	universes = universes,
+	assets = assets,
 }
