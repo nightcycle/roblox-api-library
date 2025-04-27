@@ -141,7 +141,7 @@ function LuauExecutionUtil.post<V>(
 	content: string,
 	timeout: number
 ): Future<
-	Result<Result<OkLuauExecutionTask<V>, ErrLuauExecutionTask>, reqwest.Response>
+	Result<Result<OkLuauExecutionTask<V>, ErrLuauExecutionTask>, reqwest.Response<unknown?>>
 >
 	return future.from(function(): any
 		return client

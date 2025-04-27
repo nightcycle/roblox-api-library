@@ -56,19 +56,21 @@ function Util.post(
 		local baseRequest = client
 			.fromAPIKey()
 			:post(
-				reqwest.Url
-					.tryFrom(
-						CONSTANTS.OPEN_CLOUD_BASE_URL
-							.. `/datastores/v1/universes/{universeId}/standard-datastores/datastore/entries/entry/increment`
-					)
-					:unwrap()
-					:query(hashMap.from({
+				reqwest.Url.from(
+					CONSTANTS.OPEN_CLOUD_BASE_URL
+						.. `/datastores/v1/universes/{universeId}/standard-datastores/datastore/entries/entry/increment`,
+					{
 						datastoreName = datastoreName,
 						entryKey = entryKey,
 						scope = scope:unwrapOr("global"),
-						exclusiveCreate = exclusiveCreate:asNullable(),
-						incrementBy = delta,
-					}))
+						exclusiveCreate = exclusiveCreate:match(function(v): string?
+							return tostring(v)
+						end, function()
+							return nil
+						end),
+						incrementBy = tostring(delta),
+					}
+				)
 			)
 			:header("Content-Type", "application/json")
 

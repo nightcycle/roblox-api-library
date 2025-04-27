@@ -81,7 +81,7 @@ function Util.post(
 	return future.from(function(): any
 		return client
 			.fromAPIKey()
-			:post(reqwest.Url.tryFrom(CONSTANTS.OPEN_CLOUD_BASE_URL .. `/assets/v1/assets`):unwrap())
+			:post(reqwest.Url.from(CONSTANTS.OPEN_CLOUD_BASE_URL .. `/assets/v1/assets`))
 			:body(body)
 			:header("Content-Type", `multipart/form-data; boundary={form.boundary}`)
 			:build()

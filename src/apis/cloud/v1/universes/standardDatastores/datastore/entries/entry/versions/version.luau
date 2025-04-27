@@ -3,7 +3,6 @@
 local result = require("@pkg/@nightcycle/result")
 local option = require("@pkg/@nightcycle/option")
 local future = require("@pkg/@nightcycle/future")
-local hashMap = require("@pkg/@nightcycle/hash-map")
 local err = require("@pkg/@nightcycle/error")
 local reqwest = require("@pkg/@nightcycle/reqwest")
 
@@ -44,18 +43,16 @@ function Util.get(
 		return client
 			.fromAPIKey()
 			:get(
-				reqwest.Url
-					.tryFrom(
-						CONSTANTS.OPEN_CLOUD_BASE_URL
-							.. `/datastores/v1/universes/{universeId}/standard-datastores/datastore/entries/entry/versions/version`
-					)
-					:unwrap()
-					:query(hashMap.from({
+				reqwest.Url.from(
+					CONSTANTS.OPEN_CLOUD_BASE_URL
+						.. `/datastores/v1/universes/{universeId}/standard-datastores/datastore/entries/entry/versions/version`,
+					{
 						datastoreName = datastoreName,
 						entryKey = entryKey,
 						scope = scope:unwrapOr("global"),
 						versionId = versionId,
-					}))
+					}
+				)
 			)
 			:header("Content-Type", "application/json")
 			:build()

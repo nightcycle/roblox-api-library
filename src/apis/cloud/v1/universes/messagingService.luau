@@ -41,12 +41,10 @@ function Util.post(
 		return client
 			.fromAPIKey()
 			:post(
-				reqwest.Url
-					.tryFrom(
-						CONSTANTS.OPEN_CLOUD_BASE_URL
-							.. `/messaging-service/v1/universes/{universeId}/topics/{topic}`
-					)
-					:unwrap()
+				reqwest.Url.from(
+					CONSTANTS.OPEN_CLOUD_BASE_URL
+						.. `/messaging-service/v1/universes/{universeId}/topics/{topic}`
+				)
 			)
 			:body(reqwest.Body.fromJson({
 				message = message,

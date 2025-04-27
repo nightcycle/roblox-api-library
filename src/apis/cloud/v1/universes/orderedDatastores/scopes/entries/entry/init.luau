@@ -53,12 +53,10 @@ function Util.get(
 		return client
 			.fromAPIKey()
 			:get(
-				reqwest.Url
-					.tryFrom(
-						CONSTANTS.OPEN_CLOUD_BASE_URL
-							.. `/ordered-data-stores/v1/universes/{universeId}/orderedDataStores/{datastoreName}/scopes/{scope}/entries/{entryKey}`
-					)
-					:unwrap()
+				reqwest.Url.from(
+					CONSTANTS.OPEN_CLOUD_BASE_URL
+						.. `/ordered-data-stores/v1/universes/{universeId}/orderedDataStores/{datastoreName}/scopes/{scope}/entries/{entryKey}`
+				)
 			)
 			:header("Content-Type", "application/json")
 			:build()
@@ -124,12 +122,10 @@ function Util.patch(
 		return client
 			.fromAPIKey()
 			:patch(
-				reqwest.Url
-					.tryFrom(
-						CONSTANTS.OPEN_CLOUD_BASE_URL
-							.. `/ordered-data-stores/v1/universes/{universeId}/orderedDataStores/{datastoreName}/scopes/{scope}/entries/{entryKey}`
-					)
-					:unwrap()
+				reqwest.Url.from(
+					CONSTANTS.OPEN_CLOUD_BASE_URL
+						.. `/ordered-data-stores/v1/universes/{universeId}/orderedDataStores/{datastoreName}/scopes/{scope}/entries/{entryKey}`
+				)
 			)
 			:header("Content-Type", "application/json")
 			:body(reqwest.Body.fromJson({
@@ -190,12 +186,10 @@ function Util.delete(
 		return client
 			.fromAPIKey()
 			:delete(
-				reqwest.Url
-					.tryFrom(
-						CONSTANTS.OPEN_CLOUD_BASE_URL
-							.. `/ordered-data-stores/v1/universes/{universeId}/orderedDataStores/{datastoreName}/scopes/{scope}/entries/{entryKey}`
-					)
-					:unwrap()
+				reqwest.Url.from(
+					CONSTANTS.OPEN_CLOUD_BASE_URL
+						.. `/ordered-data-stores/v1/universes/{universeId}/orderedDataStores/{datastoreName}/scopes/{scope}/entries/{entryKey}`
+				)
 			)
 			:header("Content-Type", "application/json")
 			:build()

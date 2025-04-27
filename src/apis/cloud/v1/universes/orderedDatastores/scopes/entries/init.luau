@@ -58,15 +58,13 @@ function Util.post(
 		return client
 			.fromAPIKey()
 			:post(
-				reqwest.Url
-					.tryFrom(
-						CONSTANTS.OPEN_CLOUD_BASE_URL
-							.. `/ordered-data-stores/v1/universes/{universeId}/orderedDataStores/{datastoreName}/scopes/{scope}/entries`
-					)
-					:unwrap()
-					:query({
+				reqwest.Url.from(
+					CONSTANTS.OPEN_CLOUD_BASE_URL
+						.. `/ordered-data-stores/v1/universes/{universeId}/orderedDataStores/{datastoreName}/scopes/{scope}/entries`,
+					{
 						id = entryKey,
-					})
+					}
+				)
 			)
 			:header("Content-Type", "application/json")
 			:body(reqwest.Body.fromJson({
@@ -137,16 +135,17 @@ function Util.get(
 		return client
 			.fromAPIKey()
 			:get(
-				reqwest.Url
-					.tryFrom(
-						CONSTANTS.OPEN_CLOUD_BASE_URL
-							.. `/ordered-data-stores/v1/universes/{universeId}/orderedDataStores/{datastoreName}/scopes/{scope}/entries`
-					)
-					:unwrap()
-					:query(hashMap.from({
+				reqwest.Url.from(
+					CONSTANTS.OPEN_CLOUD_BASE_URL
+						.. `/ordered-data-stores/v1/universes/{universeId}/orderedDataStores/{datastoreName}/scopes/{scope}/entries`,
+					{
 						page_token = cursor:asNullable(),
-						max_page_size = limit:asNullable(),
-						order_by = orderBy:asNullable(),
+						max_page_size = limit:match(function(v): string?
+							return tostring(v)
+						end, function()
+							return nil
+						end),
+						order_by = orderBy:asNullable() :: string?,
 						filter = minValue:match(function(min): string?
 							return maxValue:match(function(max): string?
 								return `entry <= {max} && entry >= {min}`
@@ -160,7 +159,8 @@ function Util.get(
 								return nil
 							end)
 						end),
-					}))
+					}
+				)
 			)
 			:build()
 			:send()

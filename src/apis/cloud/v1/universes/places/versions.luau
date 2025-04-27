@@ -44,12 +44,12 @@ function Util.post(
 		return client
 			.fromAPIKey()
 			:post(
-				reqwest.Url
-					.tryFrom(CONSTANTS.OPEN_CLOUD_BASE_URL .. `/universes/v1/{universeId}/places/{placeId}/versions`)
-					:unwrap()
-					:query(hashMap.from({
-						versionType = versionType,
-					}))
+				reqwest.Url.from(
+					CONSTANTS.OPEN_CLOUD_BASE_URL .. `/universes/v1/{universeId}/places/{placeId}/versions`,
+					{
+						versionType = versionType :: string,
+					}
+				)
 			)
 			:body(
 				reqwest.Body.fromOctetStream(

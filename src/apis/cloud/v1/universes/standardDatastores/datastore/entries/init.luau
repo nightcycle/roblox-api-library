@@ -61,20 +61,26 @@ function Util.get(
 		return client
 			.fromAPIKey()
 			:get(
-				reqwest.Url
-					.tryFrom(
-						CONSTANTS.OPEN_CLOUD_BASE_URL
-							.. `/datastores/v1/universes/{universeId}/standard-datastores/datastore/entries`
-					)
-					:unwrap()
-					:query(hashMap.from({
+				reqwest.Url.from(
+					CONSTANTS.OPEN_CLOUD_BASE_URL
+						.. `/datastores/v1/universes/{universeId}/standard-datastores/datastore/entries`,
+					{
 						datastoreName = datastoreName,
 						cursor = cursor:asNullable(),
-						limit = limit:asNullable(),
+						limit = limit:match(function(v: number): string?
+							return tostring(v)
+						end, function()
+							return nil
+						end),
 						prefix = prefix:asNullable(),
-						allScopes = allScopes:asNullable(),
-						scope = scope:unwrapOr("global"),
-					}))
+						allScopes = allScopes:match(function(v: boolean): string?
+							return tostring(v)
+						end, function()
+							return nil
+						end),
+						scope = scope:unwrapOr("global") :: string,
+					}
+				)
 			)
 			:build()
 			:send()

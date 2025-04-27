@@ -58,7 +58,7 @@ function Util.get(
 			.fromAPIKey()
 			:get(
 				reqwest.Url
-					.tryFrom(
+					.from(
 						CONSTANTS.OPEN_CLOUD_BASE_URL
 							.. `/datastores/v1/universes/{universeId}/standard-datastores/datastore/entries/entry`
 					)
@@ -147,7 +147,7 @@ function Util.post(
 			.fromAPIKey()
 			:post(
 				reqwest.Url
-					.tryFrom(
+					.from(
 						CONSTANTS.OPEN_CLOUD_BASE_URL
 							.. `/datastores/v1/universes/{universeId}/standard-datastores/datastore/entries/entry`
 					)
@@ -251,17 +251,15 @@ function Util.delete(
 		return client
 			.fromAPIKey()
 			:delete(
-				reqwest.Url
-					.tryFrom(
-						CONSTANTS.OPEN_CLOUD_BASE_URL
-							.. `/datastores/v1/universes/{universeId}/standard-datastores/datastore/entries/entry`
-					)
-					:unwrap()
-					:query(hashMap.from({
+				reqwest.Url.from(
+					CONSTANTS.OPEN_CLOUD_BASE_URL
+						.. `/datastores/v1/universes/{universeId}/standard-datastores/datastore/entries/entry`,
+					{
 						datastoreName = datastoreName,
 						entryKey = entryKey,
 						scope = scope:unwrapOr("global"),
-					}))
+					}
+				)
 			)
 			:header("Content-Type", "application/json")
 			:build()

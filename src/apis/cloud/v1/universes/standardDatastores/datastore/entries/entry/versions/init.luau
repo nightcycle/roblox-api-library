@@ -3,7 +3,6 @@
 local result = require("@pkg/@nightcycle/result")
 local option = require("@pkg/@nightcycle/option")
 local future = require("@pkg/@nightcycle/future")
-local hashMap = require("@pkg/@nightcycle/hash-map")
 local err = require("@pkg/@nightcycle/error")
 local reqwest = require("@pkg/@nightcycle/reqwest")
 local luneUtil = require("@pkg/@nightcycle/lune-util")
@@ -59,13 +58,10 @@ function Util.get(
 		return client
 			.fromAPIKey()
 			:get(
-				reqwest.Url
-					.tryFrom(
-						CONSTANTS.OPEN_CLOUD_BASE_URL
-							.. `/datastores/v1/universes/{universeId}/standard-datastores/datastore/entries/entry/versions`
-					)
-					:unwrap()
-					:query(hashMap.from({
+				reqwest.Url.from(
+					CONSTANTS.OPEN_CLOUD_BASE_URL
+						.. `/datastores/v1/universes/{universeId}/standard-datastores/datastore/entries/entry/versions`,
+					{
 						datastoreName = datastoreName,
 						entryKey = entryKey,
 						scope = scope:unwrapOr("global"),
@@ -82,7 +78,8 @@ function Util.get(
 						end),
 						sortOrder = sortOrder:asNullable(),
 						limit = limit:asNullable(),
-					}))
+					} :: { [string]: any }
+				)
 			)
 			:header("Content-Type", "application/json")
 			:build()

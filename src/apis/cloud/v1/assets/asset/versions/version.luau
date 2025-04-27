@@ -55,14 +55,9 @@ function Util.get(
 	return future.from(function(): any
 		return client
 			.fromAPIKey()
-			:get(
-				reqwest.Url
-					.tryFrom(CONSTANTS.OPEN_CLOUD_BASE_URL .. `/assets/v1/assets/{assetId}`)
-					:unwrap()
-					:query({
-						readMask = table.concat(hashMap.from(readMask):intoKeys():drain(), "%2C"),
-					})
-			)
+			:get(reqwest.Url.from(CONSTANTS.OPEN_CLOUD_BASE_URL .. `/assets/v1/assets/{assetId}`, {
+				readMask = table.concat(hashMap.from(readMask):intoKeys():drain(), "%2C"),
+			}))
 			:build()
 			:send()
 			:await()

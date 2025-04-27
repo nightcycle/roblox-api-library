@@ -3,12 +3,8 @@
 local result = require("@pkg/@nightcycle/result")
 local option = require("@pkg/@nightcycle/option")
 local future = require("@pkg/@nightcycle/future")
-local hashMap = require("@pkg/@nightcycle/hash-map")
-local vec = require("@pkg/@nightcycle/vec")
-local vecDeque = require("@pkg/@nightcycle/vec-deque")
 local err = require("@pkg/@nightcycle/error")
 local reqwest = require("@pkg/@nightcycle/reqwest")
-local luneUtil = require("@pkg/@nightcycle/lune-util")
 
 -- Modules
 local client = require("../../../../../client")
@@ -21,14 +17,8 @@ local CONSTANTS = require("../../../../../CONSTANTS")
 type Result<V, E> = result.Result<V, E>
 type Option<V> = option.Option<V>
 type Future<V> = future.Future<V>
-type HashMap<K, V> = hashMap.HashMap<K, V>
-type MutHashMap<K, V> = hashMap.MutHashMap<K, V>
-type Vec<V> = vec.Vec<V>
-type MutVec<V> = vec.MutVec<V>
-type VecDeque<V> = vecDeque.VecDeque<V>
 type Error<V, B> = err.Error<V, B>
 type Response<B> = reqwest.Response<B>
-type CompatDateTime = luneUtil.CompatDateTime
 type OkBody = {
 	datastores: { { name: string, createdTime: string } },
 	nextPageCursor: string,
@@ -54,17 +44,19 @@ function Util.get(
 		return client
 			.fromAPIKey()
 			:get(
-				reqwest.Url
-					.tryFrom(
-						CONSTANTS.OPEN_CLOUD_BASE_URL
-							.. `/datastores/v1/universes/{universeId}/standard-datastores`
-					)
-					:unwrap()
-					:query(hashMap.from({
+				reqwest.Url.from(
+					CONSTANTS.OPEN_CLOUD_BASE_URL
+						.. `/datastores/v1/universes/{universeId}/standard-datastores`,
+					{
 						cursor = cursor:asNullable(),
-						limit = limit:asNullable(),
+						limit = limit:match(function(v): string?
+							return tostring(v)
+						end, function()
+							return nil
+						end),
 						prefix = prefix:asNullable(),
-					}))
+					}
+				)
 			)
 			:build()
 			:send()

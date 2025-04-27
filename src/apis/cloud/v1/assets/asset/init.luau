@@ -8,7 +8,6 @@ local vec = require("@pkg/@nightcycle/vec")
 local vecDeque = require("@pkg/@nightcycle/vec-deque")
 local err = require("@pkg/@nightcycle/error")
 local reqwest = require("@pkg/@nightcycle/reqwest")
-local luneUtil = require("@pkg/@nightcycle/lune-util")
 -- Modules
 local client = require("../../../../../client")
 local restore = require("./restore")
@@ -61,14 +60,9 @@ function Util.get(
 	return future.from(function(): any
 		return client
 			.fromAPIKey()
-			:get(
-				reqwest.Url
-					.tryFrom(CONSTANTS.OPEN_CLOUD_BASE_URL .. `/assets/v1/assets/{assetId}`)
-					:unwrap()
-					:query({
-						readMask = table.concat(hashMap.from(readMask):intoKeys():drain(), "%2C"),
-					})
-			)
+			:get(reqwest.Url.from(CONSTANTS.OPEN_CLOUD_BASE_URL .. `/assets/v1/assets/{assetId}`, {
+				readMask = table.concat(hashMap.from(readMask):intoKeys():drain(), "%2C"),
+			}))
 			:build()
 			:send()
 			:await()
@@ -179,14 +173,9 @@ function Util.patch(
 	return future.from(function(): any
 		return client
 			.fromAPIKey()
-			:patch(
-				reqwest.Url
-					.tryFrom(CONSTANTS.OPEN_CLOUD_BASE_URL .. `/assets/v1/assets/{assetId}`)
-					:unwrap()
-					:query({
-						updateMask = table.concat(updateMask, "%2C"),
-					})
-			)
+			:patch(reqwest.Url.from(CONSTANTS.OPEN_CLOUD_BASE_URL .. `/assets/v1/assets/{assetId}`, {
+				updateMask = table.concat(updateMask, "%2C"),
+			}))
 			:body(body)
 			:header("Content-Type", `multipart/form-data; boundary={form.boundary}`)
 			:build()

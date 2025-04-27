@@ -41,15 +41,10 @@ function Util.get(
 	return future.from(function(): any
 		return client
 			.fromAPIKey()
-			:get(
-				reqwest.Url
-					.tryFrom(CONSTANTS.OPEN_CLOUD_BASE_URL .. `/assets/v1/assets/{assetId}`)
-					:unwrap()
-					:query({
-						maxPageSize = maxPageSize:asNullable(),
-						pageToken = pageToken:asNullable(),
-					})
-			)
+			:get(reqwest.Url.from(CONSTANTS.OPEN_CLOUD_BASE_URL .. `/assets/v1/assets/{assetId}`, {
+				maxPageSize = maxPageSize:asNullable(),
+				pageToken = pageToken:asNullable(),
+			}))
 			:build()
 			:send()
 			:await()

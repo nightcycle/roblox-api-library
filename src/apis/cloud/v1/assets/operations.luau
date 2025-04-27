@@ -95,11 +95,7 @@ function Util.get(operationId: string): Future<Result<Response<OperationData>, R
 	return future.from(function(): any
 		return client
 			.fromAPIKey()
-			:get(
-				reqwest.Url
-					.tryFrom(CONSTANTS.OPEN_CLOUD_BASE_URL .. `/assets/v1/operations/{operationId}`)
-					:unwrap()
-			)
+			:get(reqwest.Url.from(CONSTANTS.OPEN_CLOUD_BASE_URL .. `/assets/v1/operations/{operationId}`))
 			:build()
 			:send()
 			:await()

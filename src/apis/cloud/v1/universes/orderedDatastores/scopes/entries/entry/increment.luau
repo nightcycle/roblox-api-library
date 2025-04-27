@@ -42,12 +42,10 @@ function Util.post(
 		return client
 			.fromAPIKey()
 			:post(
-				reqwest.Url
-					.tryFrom(
-						CONSTANTS.OPEN_CLOUD_BASE_URL
-							.. `/ordered-data-stores/v1/universes/{universeId}/orderedDataStores/{datastoreName}/scopes/{scope}/entries/{entryKey}:increment`
-					)
-					:unwrap()
+				reqwest.Url.from(
+					CONSTANTS.OPEN_CLOUD_BASE_URL
+						.. `/ordered-data-stores/v1/universes/{universeId}/orderedDataStores/{datastoreName}/scopes/{scope}/entries/{entryKey}:increment`
+				)
 			)
 			:body(reqwest.Body.fromJson({
 				amount = delta,
