@@ -1,6 +1,6 @@
 #!/bin/sh
 ROJO_PROJECT="dev.project.json"
-aftman install
+rokit install
 set -e
 sh scripts/download-types.sh
 sh scripts/wally-install.sh "$ROJO_PROJECT"
