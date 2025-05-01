@@ -5,7 +5,7 @@ local fs = require("@lune/fs")
 local luneUtil = require("@pkg/@nightcycle/lune-util")
 local err = require("@pkg/@nightcycle/error")
 -- Modules
-local src = require("../src")
+local placesVersions = require("../src/apis/cloud/v1/universes/places/versions")
 -- Types
 -- Constants
 local PLACE_ID = tonumber(luneUtil.Env["PLACE_ID"]:expect(`PLACE_ID is not set`))
@@ -20,21 +20,11 @@ local place = fs.readFile(PLACE_PATH)
 -- Class
 print(
 	`saved place: {err.displayAsJson(
-		src.apis.cloud.v1.universes.places.versions
-			.post(UNIVERSE_ID, PLACE_ID, "Saved", place)
-			:await()
-			:unwrap()
-			:json()
-			:unwrap()
+		placesVersions.post(UNIVERSE_ID, PLACE_ID, "Saved", place):await():unwrap():json():unwrap()
 	)}`
 )
 print(
 	`publish place: {err.displayAsJson(
-		src.apis.cloud.v1.universes.places.versions
-			.post(UNIVERSE_ID, PLACE_ID, "Published", place)
-			:await()
-			:unwrap()
-			:json()
-			:unwrap()
+		placesVersions.post(UNIVERSE_ID, PLACE_ID, "Published", place):await():unwrap():json():unwrap()
 	)}`
 )

@@ -12,7 +12,6 @@ local luneUtil = require("@pkg/@nightcycle/lune-util")
 -- Modules
 local client = require("../../../../client")
 local operations = require("./operations")
-local asset = require("./asset")
 -- Constants
 local CONSTANTS = require("../../../../CONSTANTS")
 -- Types
@@ -31,8 +30,6 @@ type Response<B> = reqwest.Response<B>
 
 -- Class
 local Util = {}
-Util.operations = operations
-Util.asset = asset
 
 function Util.post(
 	assetType: operations.AssetType,

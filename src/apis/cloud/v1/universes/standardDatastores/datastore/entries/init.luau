@@ -12,7 +12,6 @@ local luneUtil = require("@pkg/@nightcycle/lune-util")
 
 -- Modules
 local client = require("../../../../../../../client")
-local entry = require("./entry")
 
 -- Constants
 local CONSTANTS = require("../../../../../../../CONSTANTS")
@@ -39,7 +38,6 @@ type DataStoreEntryValue =
 
 -- Class
 local Util = {}
-Util.entry = entry
 
 -- lists the entries
 function Util.get(

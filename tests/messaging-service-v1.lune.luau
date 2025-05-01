@@ -4,7 +4,7 @@
 local luneUtil = require("@pkg/@nightcycle/lune-util")
 local err = require("@pkg/@nightcycle/error")
 -- Modules
-local src = require("../src")
+local messagingService = require("../src/apis/cloud/v1/universes/messagingService")
 -- Types
 -- Constants
 local UNIVERSE_ID = tonumber(luneUtil.Env["UNIVERSE_ID"]:expect(`UNIVERSE_ID is not set`))
@@ -17,11 +17,6 @@ local MESSAGE = "test-message"
 -- Class
 print(
 	`sent message: {err.displayAsJson(
-		src.apis.cloud.v1.universes.messagingService
-			.post(UNIVERSE_ID, TOPIC, MESSAGE)
-			:await()
-			:unwrap()
-			:text()
-			:unwrap()
+		messagingService.post(UNIVERSE_ID, TOPIC, MESSAGE):await():unwrap():text():unwrap()
 	)}`
 )

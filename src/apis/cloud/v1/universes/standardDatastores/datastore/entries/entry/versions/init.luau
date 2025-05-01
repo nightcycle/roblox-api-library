@@ -9,7 +9,6 @@ local luneUtil = require("@pkg/@nightcycle/lune-util")
 
 -- Modules
 local client = require("../../../../../../../../../client")
-local vers = require("./version")
 
 -- Constants
 local CONSTANTS = require("../../../../../../../../../CONSTANTS")
@@ -26,7 +25,6 @@ type CompatDateTime = luneUtil.CompatDateTime
 -- Private Functions
 -- Class
 local Util = {}
-Util.version = vers
 
 -- lists the datastores
 function Util.get(

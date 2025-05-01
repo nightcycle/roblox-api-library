@@ -8,7 +8,6 @@ local reqwest = require("@pkg/@nightcycle/reqwest")
 
 -- Modules
 local client = require("../../../../../client")
-local datastore = require("./datastore")
 
 -- Constants
 local CONSTANTS = require("../../../../../CONSTANTS")
@@ -27,8 +26,6 @@ type OkBody = {
 
 -- Class
 local Util = {}
-
-Util.datastore = datastore
 
 -- lists the datastores
 function Util.get(

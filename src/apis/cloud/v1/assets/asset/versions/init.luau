@@ -8,10 +8,8 @@ local vec = require("@pkg/@nightcycle/vec")
 local vecDeque = require("@pkg/@nightcycle/vec-deque")
 local err = require("@pkg/@nightcycle/error")
 local reqwest = require("@pkg/@nightcycle/reqwest")
-local luneUtil = require("@pkg/@nightcycle/lune-util")
 -- Modules
-local client = require("../../../../../client")
-local version = require("./version")
+local client = require("../../../../../../client")
 local operations = require("../../operations")
 -- Constants
 local CONSTANTS = require("../../../../../../CONSTANTS")
@@ -31,7 +29,6 @@ type Response<B> = reqwest.Response<B>
 
 -- Class
 local Util = {}
-Util.version = version
 
 function Util.get(
 	assetId: number,
@@ -42,7 +39,7 @@ function Util.get(
 		return client
 			.fromAPIKey()
 			:get(reqwest.Url.from(CONSTANTS.OPEN_CLOUD_BASE_URL .. `/assets/v1/assets/{assetId}`, {
-				maxPageSize = maxPageSize:asNullable(),
+				maxPageSize = maxPageSize:asNullable() :: any,
 				pageToken = pageToken:asNullable(),
 			}))
 			:build()

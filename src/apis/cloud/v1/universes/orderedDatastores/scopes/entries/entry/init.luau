@@ -12,7 +12,6 @@ local luneUtil = require("@pkg/@nightcycle/lune-util")
 
 -- Modules
 local client = require("../../../../../../../../client")
-local increment = require("./increment")
 
 -- Constants
 local CONSTANTS = require("../../../../../../../../CONSTANTS")
@@ -34,7 +33,6 @@ type CompatDateTime = luneUtil.CompatDateTime
 
 -- Class
 local Util = {}
-Util.increment = increment
 
 function Util.get(
 	universeId: number,

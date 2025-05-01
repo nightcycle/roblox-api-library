@@ -13,8 +13,6 @@ local hashLib = require("@pkg/@nightcycle/hashlib")
 
 -- Modules
 local client = require("../../../../../../../../client")
-local increment = require("./increment")
-local versions = require("./versions")
 -- Constants
 local CONSTANTS = require("../../../../../../../../CONSTANTS")
 
@@ -40,9 +38,6 @@ type DataStoreEntryValue =
 
 -- Class
 local Util = {}
-
-Util.versions = versions
-Util.increment = increment
 
 function Util.get(
 	universeId: number,

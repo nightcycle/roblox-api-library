@@ -7,6 +7,17 @@ local option = require("@pkg/@nightcycle/option")
 local vec = require("@pkg/@nightcycle/vec")
 -- Modules
 local standardDatastores = require("../src/apis/cloud/v1/universes/standardDatastores")
+local standardDatastoresDatastoreEntriesEntry =
+	require("../src/apis/cloud/v1/universes/standardDatastores/datastore/entries/entry")
+local standardDatastoresDatastoreEntriesEntryIncrement =
+	require("../src/apis/cloud/v1/universes/standardDatastores/datastore/entries/entry/increment")
+local standardDatastoresDatastoreEntries =
+	require("../src/apis/cloud/v1/universes/standardDatastores/datastore/entries")
+local standardDatastoresDatastoreEntriesEntryVersions =
+	require("../src/apis/cloud/v1/universes/standardDatastores/datastore/entries/entry/versions")
+local standardDatastoresDatastoreEntriesEntryVersionsVersion =
+	require("../src/apis/cloud/v1/universes/standardDatastores/datastore/entries/entry/versions/version")
+
 -- Types
 -- Constants
 local UNIVERSE_ID = tonumber(luneUtil.Env["UNIVERSE_ID"]:expect(`UNIVERSE_ID is not set`))
@@ -33,7 +44,7 @@ print(
 
 print(
 	`got datastore keys: {err.displayAsJson(
-		standardDatastores.datastore.entries
+		standardDatastoresDatastoreEntries
 			.get(UNIVERSE_ID, DS_NAME, option.none(), option.none(), option.none(), option.none(), option.none())
 			:await()
 			:unwrap()
@@ -44,7 +55,7 @@ print(
 
 print(
 	`posted datastore entry: {err.displayAsJson(
-		standardDatastores.datastore.entries.entry
+		standardDatastoresDatastoreEntriesEntry
 			.post(
 				UNIVERSE_ID,
 				DS_NAME,
@@ -65,7 +76,7 @@ print(
 
 print(
 	`posted datastore number entry: {err.displayAsJson(
-		standardDatastores.datastore.entries.entry
+		standardDatastoresDatastoreEntriesEntry
 			.post(
 				UNIVERSE_ID,
 				DS_NAME,
@@ -86,7 +97,7 @@ print(
 
 print(
 	`got datastore entry: {err.displayAsJson(
-		standardDatastores.datastore.entries.entry
+		standardDatastoresDatastoreEntriesEntry
 			.get(UNIVERSE_ID, DS_NAME, DS_KEY, option.none())
 			:await()
 			:unwrap()
@@ -97,7 +108,7 @@ print(
 
 print(
 	`list datastore entry version: {err.displayAsJson(
-		standardDatastores.datastore.entries.entry.versions
+		standardDatastoresDatastoreEntriesEntryVersions
 			.get(
 				UNIVERSE_ID,
 				DS_NAME,
@@ -118,7 +129,7 @@ print(
 
 print(
 	`got datastore entry version: {err.displayAsJson(
-		standardDatastores.datastore.entries.entry.versions.version
+		standardDatastoresDatastoreEntriesEntryVersionsVersion
 			.get(UNIVERSE_ID, DS_NAME, DS_KEY, "08DD7FC87F88736D.000000000E.08DD7FCA896E4834.01", option.none())
 			:await()
 			:unwrap()
@@ -129,7 +140,7 @@ print(
 
 print(
 	`posted datastore increment entry: {err.displayAsJson(
-		standardDatastores.datastore.entries.entry.increment
+		standardDatastoresDatastoreEntriesEntryIncrement
 			.post(UNIVERSE_ID, DS_NAME, DS_INC_KEY, 1, option.none(), option.none(), option.none(), option.none())
 			:await()
 			:unwrap()
@@ -140,8 +151,8 @@ print(
 
 print(
 	`deleted datastore increment entry: {err.displayAsJson(
-		standardDatastores.datastore.entries.entry
-			.delete(UNIVERSE_ID, DS_NAME, DS_INC_KEY, option.none(), option.none(), option.none())
+		standardDatastoresDatastoreEntriesEntry
+			.delete(UNIVERSE_ID, DS_NAME, DS_INC_KEY, option.none())
 			:await()
 			:unwrap()
 			:text()

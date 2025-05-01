@@ -5,9 +5,11 @@ local fs = require("@lune/fs")
 local luneUtil = require("@pkg/@nightcycle/lune-util")
 local err = require("@pkg/@nightcycle/error")
 local option = require("@pkg/@nightcycle/option")
-local vec = require("@pkg/@nightcycle/vec")
 -- Modules
 local assets = require("../src/apis/cloud/v1/assets")
+local assetsOperations = require("../src/apis/cloud/v1/assets/operations")
+local assetsAsset = require("../src/apis/cloud/v1/assets/asset")
+
 -- Types
 -- Constants
 local GROUP_ID = tonumber(luneUtil.Env["GROUP_ID"]:expect(`GROUP_ID is not set`))
@@ -33,7 +35,7 @@ if CREATE_ENABLED then
 	local operationId = createdAsset["operationId"]
 	while true do
 		luneUtil.Task.wait(0.1)
-		local operationData = assets.operations.get(operationId):await():unwrap():json():unwrap()
+		local operationData = assetsOperations.get(operationId):await():unwrap():json():unwrap()
 		print(`operation: {err.displayAsJson(operationData)}`)
 		if operationData["done"] then
 			break
@@ -41,7 +43,7 @@ if CREATE_ENABLED then
 	end
 end
 
-print(`getting asset: {err.displayAsJson(assets.asset
+print(`getting asset: {err.displayAsJson(assetsAsset
 	.get(2971874773, {
 		description = true,
 		displayName = true,
@@ -63,7 +65,7 @@ print(`getting asset: {err.displayAsJson(assets.asset
 	:unwrap())}`)
 
 do
-	local updateAsset = assets.asset
+	local updateAsset = assetsAsset
 		.patch(
 			ASSET_ID,
 			option.some(fs.readFile(PNG_PATH) :: string | buffer),
@@ -79,7 +81,7 @@ do
 	local operationId = updateAsset["operationId"]
 	while true do
 		luneUtil.Task.wait(0.1)
-		local operationData = assets.operations.get(operationId):await():unwrap():json():unwrap()
+		local operationData = assetsOperations.get(operationId):await():unwrap():json():unwrap()
 		print(`operation: {err.displayAsJson(operationData)}`)
 		if operationData["done"] then
 			break
