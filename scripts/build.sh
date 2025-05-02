@@ -48,7 +48,7 @@ cp -r "default.project.json" "$build_dir/default.project.json"
 
 if [ "$is_wally" = true ]; then
 	cp -r "wally.toml" "$build_dir/wally.toml"
-	cp -r "aftman.toml" "$build_dir/aftman.toml"
+	cp -r "rokit.toml" "$build_dir/rokit.toml"
 fi
 
 # if stage-src exists, remove it

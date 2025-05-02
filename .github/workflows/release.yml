@@ -51,9 +51,8 @@ jobs:
       # Checkout your Git repo
       - uses: actions/checkout@v2
 
-      - uses: ok-nick/setup-aftman@v0.4.2
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install Tooling
+        uses: CompeyDev/setup-rokit@v0.1.2
 
       - name: set-up lune
         run: lune setup
@@ -101,9 +100,8 @@ jobs:
       # Checkout your Git repo
       - uses: actions/checkout@v4
 
-      - uses: ok-nick/setup-aftman@v0.4.2
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install Tooling
+        uses: CompeyDev/setup-rokit@v0.1.2
 
       - name: set-up lune
         run: lune setup

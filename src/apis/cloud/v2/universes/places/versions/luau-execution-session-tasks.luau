@@ -96,7 +96,7 @@ function parseBaseResponse(jsonResponse: { [string]: unknown? }): BaseLuauExecut
 	}
 end
 
-function parseResponse<V>(response: reqwest.Response): Result<OkLuauExecutionTask<V>, ErrLuauExecutionTask>
+function parseResponse<V>(response: reqwest.Response<any>): Result<OkLuauExecutionTask<V>, ErrLuauExecutionTask>
 	local json: { [string]: unknown? } = response:json():unwrap() :: any
 	if json["error"] then
 		local errTask = parseBaseResponse(json) :: ErrLuauExecutionTask

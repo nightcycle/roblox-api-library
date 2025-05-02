@@ -160,6 +160,7 @@ function Util.get(
 					}
 				)
 			)
+			:header("Content-Type", "application/json")
 			:build()
 			:send()
 			:await()

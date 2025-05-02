@@ -5,7 +5,12 @@ local luneUtil = require("@pkg/@nightcycle/lune-util")
 local err = require("@pkg/@nightcycle/error")
 local option = require("@pkg/@nightcycle/option")
 -- Modules
-local orderedDatastores = require("../src/apis/cloud/v1/universes/orderedDatastores")
+local orderedDatastoresScopesEntries =
+	require("../src/apis/cloud/v1/universes/orderedDatastores/scopes/entries")
+local orderedDatastoresScopesEntriesEntry =
+	require("../src/apis/cloud/v1/universes/orderedDatastores/scopes/entries/entry")
+local orderedDatastoresScopesEntriesEntryIncrement =
+	require("../src/apis/cloud/v1/universes/orderedDatastores/scopes/entries/entry/increment")
 -- Types
 -- Constants
 local UNIVERSE_ID = tonumber(luneUtil.Env["UNIVERSE_ID"]:expect(`UNIVERSE_ID is not set`))
@@ -20,7 +25,7 @@ local DS_SCOPE = "test-scope"
 
 print(
 	`list ordered-datastore keys: {err.displayAsJson(
-		orderedDatastores.scopes.entries
+		orderedDatastoresScopesEntries
 			.get(
 				UNIVERSE_ID,
 				DS_NAME,
@@ -40,7 +45,7 @@ print(
 
 print(
 	`posted ordered-datastore number entry: {err.displayAsJson(
-		orderedDatastores.scopes.entries
+		orderedDatastoresScopesEntries
 			.post(UNIVERSE_ID, DS_NAME, DS_SCOPE, DS_KEY, 0)
 			:await()
 			:unwrap()
@@ -51,7 +56,7 @@ print(
 
 print(
 	`patched ordered-datastore number entry: {err.displayAsJson(
-		orderedDatastores.scopes.entries.entry
+		orderedDatastoresScopesEntriesEntry
 			.patch(UNIVERSE_ID, DS_NAME, DS_SCOPE, DS_KEY, 1)
 			:await()
 			:unwrap()
@@ -62,7 +67,7 @@ print(
 
 print(
 	`got ordered-datastore entry: {err.displayAsJson(
-		orderedDatastores.scopes.entries.entry
+		orderedDatastoresScopesEntriesEntry
 			.get(UNIVERSE_ID, DS_NAME, DS_SCOPE, DS_KEY)
 			:await()
 			:unwrap()
@@ -73,7 +78,7 @@ print(
 
 print(
 	`posted ordered-datastore increment entry: {err.displayAsJson(
-		orderedDatastores.scopes.entries.entry.increment
+		orderedDatastoresScopesEntriesEntryIncrement
 			.post(UNIVERSE_ID, DS_NAME, DS_SCOPE, DS_KEY, 1)
 			:await()
 			:unwrap()
@@ -84,7 +89,7 @@ print(
 
 print(
 	`deleted ordered-datastore increment entry: {err.displayAsJson(
-		orderedDatastores.scopes.entries.entry
+		orderedDatastoresScopesEntriesEntry
 			.delete(UNIVERSE_ID, DS_NAME, DS_SCOPE, DS_KEY)
 			:await()
 			:unwrap()
