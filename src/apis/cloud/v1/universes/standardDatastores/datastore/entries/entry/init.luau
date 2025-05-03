@@ -52,17 +52,15 @@ function Util.get(
 		return client
 			.fromAPIKey()
 			:get(
-				reqwest.Url
-					.from(
-						CONSTANTS.OPEN_CLOUD_BASE_URL
-							.. `/datastores/v1/universes/{universeId}/standard-datastores/datastore/entries/entry`
-					)
-					:unwrap()
-					:query(hashMap.from({
+				reqwest.Url.from(
+					CONSTANTS.OPEN_CLOUD_BASE_URL
+						.. `/datastores/v1/universes/{universeId}/standard-datastores/datastore/entries/entry`,
+					{
 						datastoreName = datastoreName,
 						entryKey = entryKey,
 						scope = scope:unwrapOr("global"),
-					}))
+					}
+				)
 			)
 			:header("Content-Type", "application/x-www-form-urlencoded")
 			:build()
@@ -141,19 +139,17 @@ function Util.post(
 		local baseRequest = client
 			.fromAPIKey()
 			:post(
-				reqwest.Url
-					.from(
-						CONSTANTS.OPEN_CLOUD_BASE_URL
-							.. `/datastores/v1/universes/{universeId}/standard-datastores/datastore/entries/entry`
-					)
-					:unwrap()
-					:query(hashMap.from({
+				reqwest.Url.from(
+					CONSTANTS.OPEN_CLOUD_BASE_URL
+						.. `/datastores/v1/universes/{universeId}/standard-datastores/datastore/entries/entry`,
+					{
 						datastoreName = datastoreName,
 						entryKey = entryKey,
 						scope = scope:unwrapOr("global"),
-						matchVersion = matchVersion:asNullable(),
-						exclusiveCreate = exclusiveCreate:asNullable(),
-					}))
+						matchVersion = matchVersion:asNullable() :: any,
+						exclusiveCreate = exclusiveCreate:asNullable() :: any,
+					}
+				)
 			)
 			:header("Content-Type", "application/json")
 			:body(body)
