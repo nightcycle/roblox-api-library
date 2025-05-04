@@ -10,9 +10,9 @@ local vecDeque = require("@pkg/@nightcycle/vec-deque")
 local err = require("@pkg/@nightcycle/error")
 local reqwest = require("@pkg/@nightcycle/reqwest")
 -- Modules
-local client = require("../../../../../../client")
+local client = require("../../../../../../../client")
 -- Constants
-local CONSTANTS = require("../../../../../../CONSTANTS")
+local CONSTANTS = require("../../../../../../../CONSTANTS")
 -- Types
 type Result<V, E> = result.Result<V, E>
 type Option<V> = option.Option<V>
@@ -23,6 +23,7 @@ type Vec<V> = vec.Vec<V>
 type MutVec<V> = vec.MutVec<V>
 type VecDeque<V> = vecDeque.VecDeque<V>
 type Error<V, B> = err.Error<V, B>
+type Response<B> = reqwest.Response<B>
 export type LuauTaskState = "STATE_UNSPECIFIED" | "QUEUED" | "PROCESSING" | "CANCELLED" | "COMPLETE" | "FAILED"
 export type LuauTaskErrorState =
 	"ERROR_CODE_UNSPECIFIED"
@@ -31,28 +32,30 @@ export type LuauTaskErrorState =
 	| "OUTPUT_SIZE_LIMIT_EXCEEDED"
 	| "INTERNAL_ERROR"
 
-export type LuauExecutionOutput<V> = {
-	results: Vec<V>,
+type LuauExecutionOutput<V> = {
+	results: { V },
 }
-export type ErrorResponse<V> = {
+type ErrorResponse<V> = {
 	code: V,
 	message: string,
 }
 type BaseLuauExecutionTask = {
 	path: string,
-	createTime: Option<luneUtil.CompatDateTime>,
-	updateTime: Option<luneUtil.CompatDateTime>,
-	timeout: Option<string>,
+	createTime: luneUtil.CompatDateTime?,
+	updateTime: luneUtil.CompatDateTime?,
+	timeout: string?,
 	user: string,
 	state: LuauTaskState,
-	script: Option<string>,
+	script: string?,
 }
-export type OkLuauExecutionTask<V> = BaseLuauExecutionTask & {
-	output: Option<LuauExecutionOutput<V>>,
+type OkLuauExecutionTask<V> = BaseLuauExecutionTask & {
+	output: LuauExecutionOutput<V>?,
 }
-export type ErrLuauExecutionTask = BaseLuauExecutionTask & {
+type ErrLuauExecutionTask = BaseLuauExecutionTask & {
 	error: ErrorResponse<LuauTaskErrorState>,
 }
+
+export type LuauExecutionTask<V> = OkLuauExecutionTask<V> | ErrLuauExecutionTask
 
 -- Constants
 
@@ -63,17 +66,13 @@ function parseBaseResponse(jsonResponse: { [string]: unknown? }): BaseLuauExecut
 	assert(typeof(path) == "string", "Path is not a string")
 	local createTimeStr = jsonResponse["createTime"]
 	assert(typeof(createTimeStr) == "string" or typeof(createTimeStr) == "nil", "CreateTime is not a string")
-	local createTime = if createTimeStr
-		then option.some(luneUtil.DateTime.fromIsoDate(createTimeStr))
-		else option.none()
+	local createTime = if createTimeStr then luneUtil.DateTime.fromIsoDate(createTimeStr) else nil
 	local updateTimeString = jsonResponse["updateTime"]
 	assert(
 		typeof(updateTimeString) == "string" or typeof(updateTimeString) == "nil",
 		"UpdateTime is not a string"
 	)
-	local updateTime = if updateTimeString
-		then option.some(luneUtil.DateTime.fromIsoDate(updateTimeString))
-		else option.none()
+	local updateTime = if updateTimeString then luneUtil.DateTime.fromIsoDate(updateTimeString) else nil
 	local user = jsonResponse["user"]
 	assert(typeof(user) == "string", "User is not a string")
 	local state: LuauTaskState = jsonResponse["state"] :: any
@@ -89,14 +88,14 @@ function parseBaseResponse(jsonResponse: { [string]: unknown? }): BaseLuauExecut
 		path = path,
 		createTime = createTime,
 		updateTime = updateTime,
-		timeout = option.from(timeoutStr),
+		timeout = option.from(timeoutStr):asNullable(),
 		user = user,
 		state = state,
-		script = if scriptStr:len() > 0 then option.some(scriptStr) else option.none(),
+		script = (if scriptStr:len() > 0 then scriptStr else nil),
 	}
 end
 
-function parseResponse<V>(response: reqwest.Response<any>): Result<OkLuauExecutionTask<V>, ErrLuauExecutionTask>
+function parseResponse<V>(response: Response<any>): Result<OkLuauExecutionTask<V>, ErrLuauExecutionTask>
 	local json: { [string]: unknown? } = response:json():unwrap() :: any
 	if json["error"] then
 		local errTask = parseBaseResponse(json) :: ErrLuauExecutionTask
@@ -120,11 +119,11 @@ function parseResponse<V>(response: reqwest.Response<any>): Result<OkLuauExecuti
 			assert(typeof(output) == "table", "output is not a table")
 			local resultList: { any } = output["results"] :: any
 			assert(typeof(resultList) == "table", "output -> results is not a table")
-			okTask.output = option.some({
-				results = vec.from(resultList),
-			})
+			okTask.output = {
+				results = resultList,
+			}
 		else
-			okTask.output = option.none()
+			okTask.output = nil
 		end
 
 		return result.ok(okTask :: any)
@@ -140,15 +139,13 @@ function LuauExecutionUtil.post<V>(
 	versionNumber: number,
 	content: string,
 	timeout: number
-): Future<
-	Result<Result<OkLuauExecutionTask<V>, ErrLuauExecutionTask>, reqwest.Response<unknown?>>
->
+): Future<Result<LuauExecutionTask<V>, Response<unknown>>>
 	return future.from(function(): any
 		return client
 			.fromAPIKey()
 			:post(
-				CONSTANTS.OPEN_CLOUD_BASE_URL_V2
-					.. `/universes/{universeId}/places/{placeId}/versions/{versionNumber}/luau-execution-session-tasks`
+				CONSTANTS.OPEN_CLOUD_BASE_URL
+					.. `/cloud/v2/universes/{universeId}/places/{placeId}/versions/{versionNumber}/luau-execution-session-tasks`
 			)
 			:body(reqwest.Body.fromJson({
 				script = content,
@@ -166,13 +163,13 @@ function LuauExecutionUtil.post<V>(
 	end)
 end
 
-function LuauExecutionUtil.get<V>(okResponsePath: string): Future<
-	Result<Result<OkLuauExecutionTask<V>, ErrLuauExecutionTask>, reqwest.Response>
->
+function LuauExecutionUtil.get<V>(
+	okResponsePath: string
+): Future<Result<LuauExecutionTask<V>, Response<unknown>>>
 	return future.from(function(): any
 		return client
 			.fromAPIKey()
-			:get(CONSTANTS.OPEN_CLOUD_BASE_URL_V2 .. `/{okResponsePath}`)
+			:get(CONSTANTS.OPEN_CLOUD_BASE_URL .. `/cloud/v2/{okResponsePath}`)
 			:header("Content-Type", "application/json")
 			:build()
 			:send()
