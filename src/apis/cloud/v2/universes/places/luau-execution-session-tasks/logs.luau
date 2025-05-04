@@ -38,7 +38,7 @@ type LuauExecutionSessionTaskLog = {
 }
 type LuauExecutionSessionTaskBody = {
 	luauExecutionSessionTaskLogs: { LuauExecutionSessionTaskLog },
-	nextPageToken: string,
+	nextPageToken: Option<string>,
 }
 -- Constants
 
@@ -68,7 +68,9 @@ function Util.get<V>(
 				local data = response:json():unwrap()
 				local output: LuauExecutionSessionTaskBody = {
 					luauExecutionSessionTaskLogs = {} :: { LuauExecutionSessionTaskLog },
-					nextPageToken = data.nextPageToken,
+					nextPageToken = if data.nextPageToken and data.nextPageToken:len() > 0
+						then option.some(data.nextPageToken)
+						else option.none(),
 				}
 				for i, log in ipairs(data.luauExecutionSessionTaskLogs) do
 					local structuredMessages: { StructuredMessage } = {}

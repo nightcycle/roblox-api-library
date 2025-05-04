@@ -50,7 +50,7 @@ function Util.get(
 	prefix: Option<string>
 ): Future<Result<{
 	keys: { { key: string } },
-	nextPageCursor: string,
+	nextPageCursor: Option<string>,
 }, Response<unknown>>>
 	return future.from(function()
 		return client
@@ -81,7 +81,13 @@ function Util.get(
 			:send()
 			:await()
 			:match(function(ok)
-				return result.ok(ok:json():unwrap())
+				local data = ok:json():unwrap()
+				return result.ok({
+					keys = data["keys"],
+					nextPageCursor = if data["nextPageCursor"] and data["nextPageCursor"]:len() > 0
+						then option.some(data["nextPageCursor"])
+						else option.none(),
+				})
 			end, function(eResponse)
 				return result.err(eResponse)
 			end)

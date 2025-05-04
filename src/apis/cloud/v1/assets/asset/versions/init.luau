@@ -38,6 +38,7 @@ function Util.get(
 	pageToken: Option<string>
 ): Future<Result<{
 	assetVersions: { operations.Object },
+	pageToken: Option<string>,
 }, Response<unknown>>>
 	return future.from(function()
 		return client
@@ -50,7 +51,13 @@ function Util.get(
 			:send()
 			:await()
 			:match(function(ok)
-				return result.ok(ok:json():unwrap())
+				local data = ok:json():unwrap()
+				return result.ok({
+					assetVersions = data["assetVersions"],
+					nextPageCursor = if data["pageToken"] and data["nextPageCursor"]:len() > 0
+						then option.some(data["pageToken"])
+						else option.none(),
+				})
 			end, function(e)
 				return result.err(e)
 			end)

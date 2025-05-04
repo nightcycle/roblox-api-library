@@ -20,7 +20,7 @@ type Error<V, B> = err.Error<V, B>
 type Response<B> = reqwest.Response<B>
 type OkBody = {
 	datastores: { { name: string, createdTime: string } },
-	nextPageCursor: string,
+	nextPageCursor: Option<string>,
 }
 -- Private Functions
 
@@ -56,7 +56,13 @@ function Util.get(
 			:send()
 			:await()
 			:match(function(ok)
-				return result.ok(ok:json():unwrap())
+				local data = ok:json():unwrap()
+				return result.ok({
+					datastores = data["datastores"] :: any,
+					nextPageCursor = if data["nextPageCursor"] and data["nextPageCursor"]:len() > 0
+						then option.some(data["nextPageCursor"])
+						else option.none(),
+				})
 			end, function(eResponse)
 				return result.err(eResponse)
 			end)

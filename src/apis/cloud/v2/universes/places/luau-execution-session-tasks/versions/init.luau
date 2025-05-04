@@ -34,18 +34,18 @@ export type LuauTaskErrorState =
 
 type BaseLuauExecutionTask = {
 	path: string,
-	createTime: luneUtil.CompatDateTime?,
-	updateTime: luneUtil.CompatDateTime?,
-	timeout: string?,
+	createTime: Option<luneUtil.CompatDateTime>,
+	updateTime: Option<luneUtil.CompatDateTime>,
+	timeout: Option<string>,
 	user: string,
 	state: LuauTaskState,
-	script: string?,
+	script: Option<string>,
 }
 export type OkLuauExecutionTask = BaseLuauExecutionTask & {
 	done: boolean,
-	output: {
+	output: Option<{
 		results: { unknown },
-	}?,
+	}>,
 }
 export type ErrLuauExecutionTask = BaseLuauExecutionTask & {
 	done: true,
@@ -86,12 +86,12 @@ function parseBaseResponse(jsonResponse: { [string]: unknown? }): BaseLuauExecut
 	return {
 		done = state == "COMPLETE" or state == "FAILED" or state == "CANCELLED",
 		path = path,
-		createTime = createTime,
-		updateTime = updateTime,
-		timeout = option.from(timeoutStr):asNullable(),
+		createTime = option.from(createTime),
+		updateTime = option.from(updateTime),
+		timeout = option.from(timeoutStr),
 		user = user,
 		state = state,
-		script = (if scriptStr:len() > 0 then scriptStr else nil),
+		script = option.from(if scriptStr:len() > 0 then scriptStr else nil),
 	}
 end
 
@@ -118,11 +118,11 @@ function parseResponse<V>(response: Response<any>): Result<OkLuauExecutionTask, 
 			assert(typeof(output) == "table", "output is not a table")
 			local resultList: { any } = output["results"] :: any
 			assert(typeof(resultList) == "table", "output -> results is not a table")
-			okTask.output = {
+			okTask.output = option.some({
 				results = resultList,
-			}
+			})
 		else
-			okTask.output = nil
+			okTask.output = option.none()
 		end
 
 		return result.ok(okTask)

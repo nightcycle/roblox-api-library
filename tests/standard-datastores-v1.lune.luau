@@ -100,7 +100,7 @@ print(
 				UNIVERSE_ID,
 				DS_NAME,
 				DS_KEY,
-				option.none(),
+				"Ascending",
 				option.none(),
 				option.none(),
 				option.none(),

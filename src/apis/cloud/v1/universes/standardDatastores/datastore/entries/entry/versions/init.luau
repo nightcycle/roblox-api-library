@@ -30,11 +30,11 @@ function Util.get(
 	universeId: number,
 	datastoreName: string,
 	entryKey: string,
+	sortOrder: "Ascending" | "Descending",
 	scope: Option<string>,
 	cursor: Option<string>,
 	startTime: Option<CompatDateTime>,
 	endTime: Option<CompatDateTime>,
-	sortOrder: Option<"Ascending" | "Descending">,
 	limit: Option<number>
 ): Future<Result<{
 	versions: {
@@ -46,7 +46,7 @@ function Util.get(
 			objectCreatedTime: string,
 		}
 	},
-	nextPageCursor: string,
+	nextPageCursor: Option<string>,
 }, Response<unknown>>>
 	return future.from(function()
 		return client
@@ -70,7 +70,7 @@ function Util.get(
 						end, function()
 							return nil
 						end),
-						sortOrder = sortOrder:asNullable(),
+						sortOrder = sortOrder,
 						limit = limit:asNullable(),
 					} :: { [string]: any }
 				)
@@ -80,7 +80,13 @@ function Util.get(
 			:send()
 			:await()
 			:match(function(ok)
-				return result.ok(ok:json():unwrap())
+				local data = ok:json():unwrap()
+				return result.ok({
+					keys = data["versions"],
+					nextPageCursor = if data["nextPageCursor"] and data["nextPageCursor"]:len() > 0
+						then option.some(data["nextPageCursor"])
+						else option.none(),
+				})
 			end, function(eResponse)
 				return result.err(eResponse)
 			end)

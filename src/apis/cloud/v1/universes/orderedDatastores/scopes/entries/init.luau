@@ -163,7 +163,13 @@ function Util.get(
 			:send()
 			:await()
 			:match(function(ok)
-				return result.ok(ok:json():unwrap())
+				local data = ok:json():unwrap()
+				return result.ok({
+					keys = data["keys"],
+					nextPageCursor = if data["nextPageCursor"] and data["nextPageCursor"]:len() > 0
+						then option.some(data["nextPageCursor"])
+						else option.none(),
+				})
 			end, function(e)
 				return result.err(e)
 			end)
