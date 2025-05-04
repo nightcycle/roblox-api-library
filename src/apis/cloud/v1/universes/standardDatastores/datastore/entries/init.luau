@@ -48,14 +48,11 @@ function Util.get(
 	cursor: Option<string>,
 	limit: Option<number>,
 	prefix: Option<string>
-): Future<Result<Response<{
+): Future<Result<{
 	keys: { { key: string } },
 	nextPageCursor: string,
-}>, Response<{
-	code: string | "JsonDecodeError",
-	message: string,
-}>>>
-	return future.from(function(): any
+}, Response<unknown>>>
+	return future.from(function()
 		return client
 			.fromAPIKey()
 			:get(
@@ -84,58 +81,9 @@ function Util.get(
 			:send()
 			:await()
 			:match(function(ok)
-				return ok:json():match(function(json)
-					-- print(`typeof: {typeof(json)}`)
-					return result.ok(ok:builder()
-						:body(reqwest.Body.fromJson({
-							keys = json["keys"],
-							nextPageCursor = json["nextPageCursor"] or "",
-						}))
-						:build())
-				end, function(e)
-					return result.err(ok:builder()
-						:body(reqwest.Body.fromJson({
-							code = "JsonDecodeError",
-							message = err.displayAsJson(e),
-						}))
-						:build())
-				end)
+				return result.ok(ok:json():unwrap())
 			end, function(eResponse)
-				local eBuilder = eResponse:builder()
-				return eResponse:json():match(function(e)
-					if e["errors"] then
-						local eCount = #e["errors"]
-						if eCount == 1 then
-							local e2 = e["errors"][1]
-							return result.err(eBuilder
-								:body(reqwest.Body.fromJson({
-									code = "UnknownError",
-									message = e2["message"],
-								}))
-								:build())
-						end
-					elseif typeof(e["code"]) == "string" and typeof(e["message"]) == "string" then
-						return result.err(eBuilder
-							:body(reqwest.Body.fromJson({
-								code = e["code"],
-								message = e["message"],
-							}))
-							:build())
-					end
-					return result.err(eBuilder
-						:body(reqwest.Body.fromJson({
-							code = "UnknownError",
-							message = err.displayAsJson(e) :: any,
-						}))
-						:build())
-				end, function(e)
-					return result.err(eBuilder
-						:body(reqwest.Body.fromJson({
-							code = "UnknownError",
-							message = err.displayAsJson(e :: any),
-						}))
-						:build())
-				end)
+				return result.err(eResponse)
 			end)
 	end)
 end

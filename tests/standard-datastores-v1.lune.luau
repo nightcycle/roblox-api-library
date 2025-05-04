@@ -33,12 +33,7 @@ local DS_VALUE = { a = 1, b = "b", c = true, d = { 1, 2, 3 }, f = { a = 1, b = 2
 
 print(
 	`list datastores: {err.displayAsJson(
-		standardDatastores
-			.get(UNIVERSE_ID, option.none(), option.none(), option.none())
-			:await()
-			:unwrap()
-			:text()
-			:unwrap()
+		standardDatastores.get(UNIVERSE_ID, option.none(), option.none(), option.none()):await():unwrap()
 	)}`
 )
 
@@ -47,8 +42,6 @@ print(
 		standardDatastoresDatastoreEntries
 			.get(UNIVERSE_ID, DS_NAME, option.none(), option.none(), option.none(), option.none(), option.none())
 			:await()
-			:unwrap()
-			:text()
 			:unwrap()
 	)}`
 )
@@ -69,8 +62,6 @@ print(
 			)
 			:await()
 			:unwrap()
-			:text()
-			:unwrap()
 	)}`
 )
 
@@ -90,8 +81,6 @@ print(
 			)
 			:await()
 			:unwrap()
-			:text()
-			:unwrap()
 	)}`
 )
 
@@ -100,8 +89,6 @@ print(
 		standardDatastoresDatastoreEntriesEntry
 			.get(UNIVERSE_ID, DS_NAME, DS_KEY, option.none())
 			:await()
-			:unwrap()
-			:text()
 			:unwrap()
 	)}`
 )
@@ -122,8 +109,6 @@ print(
 			)
 			:await()
 			:unwrap()
-			:text()
-			:unwrap()
 	)}`
 )
 
@@ -132,8 +117,6 @@ print(
 		standardDatastoresDatastoreEntriesEntryVersionsVersion
 			.get(UNIVERSE_ID, DS_NAME, DS_KEY, "08DD7FC87F88736D.000000000E.08DD7FCA896E4834.01", option.none())
 			:await()
-			:unwrap()
-			:text()
 			:unwrap()
 	)}`
 )
@@ -144,8 +127,6 @@ print(
 			.post(UNIVERSE_ID, DS_NAME, DS_INC_KEY, 1, option.none(), option.none(), option.none(), option.none())
 			:await()
 			:unwrap()
-			:text()
-			:unwrap()
 	)}`
 )
 
@@ -154,8 +135,6 @@ print(
 		standardDatastoresDatastoreEntriesEntry
 			.delete(UNIVERSE_ID, DS_NAME, DS_INC_KEY, option.none())
 			:await()
-			:unwrap()
-			:text()
 			:unwrap()
 	)}`
 )

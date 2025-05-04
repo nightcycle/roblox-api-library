@@ -20,11 +20,11 @@ local place = fs.readFile(PLACE_PATH)
 -- Class
 print(
 	`saved place: {err.displayAsJson(
-		placesVersions.post(UNIVERSE_ID, PLACE_ID, "Saved", place):await():unwrap():json():unwrap()
+		placesVersions.post(UNIVERSE_ID, PLACE_ID, "Saved", place):await():unwrap()
 	)}`
 )
 print(
 	`publish place: {err.displayAsJson(
-		placesVersions.post(UNIVERSE_ID, PLACE_ID, "Published", place):await():unwrap():json():unwrap()
+		placesVersions.post(UNIVERSE_ID, PLACE_ID, "Published", place):await():unwrap()
 	)}`
 )

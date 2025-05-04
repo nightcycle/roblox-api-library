@@ -34,13 +34,10 @@ function Util.post(
 	placeId: number,
 	versionType: "Saved" | "Published",
 	data: buffer | string
-): Future<Result<Response<{
+): Future<Result<{
 	versionNumber: number,
-}>, Response<{
-	code: string,
-	message: string,
-}>>>
-	return future.from(function(): any
+}, Response<unknown>>>
+	return future.from(function()
 		return client
 			.fromAPIKey()
 			:post(
@@ -61,27 +58,9 @@ function Util.post(
 			:send()
 			:await()
 			:match(function(ok)
-				return result.ok(ok)
+				return result.ok(ok:json():unwrap())
 			end, function(e)
-				if e["errors"] then
-					local eCount = #e["errors"]
-					if eCount == 1 then
-						local e2 = e["errors"][1]
-						return result.err({
-							code = "UnknownError",
-							message = e2["message"],
-						})
-					end
-				elseif typeof(e["code"]) == "string" and typeof(e["message"]) == "string" then
-					return result.err({
-						code = e["code"],
-						message = e["message"],
-					})
-				end
-				return result.err({
-					code = "UnknownError",
-					message = err.displayAsJson(e),
-				})
+				return result.err(e)
 			end)
 	end)
 end

@@ -38,41 +38,24 @@ print(
 			)
 			:await()
 			:unwrap()
-			:text()
-			:unwrap()
 	)}`
 )
 
 print(
 	`posted ordered-datastore number entry: {err.displayAsJson(
-		orderedDatastoresScopesEntries
-			.post(UNIVERSE_ID, DS_NAME, DS_SCOPE, DS_KEY, 0)
-			:await()
-			:unwrap()
-			:text()
-			:unwrap()
+		orderedDatastoresScopesEntries.post(UNIVERSE_ID, DS_NAME, DS_SCOPE, DS_KEY, 0):await():unwrap()
 	)}`
 )
 
 print(
 	`patched ordered-datastore number entry: {err.displayAsJson(
-		orderedDatastoresScopesEntriesEntry
-			.patch(UNIVERSE_ID, DS_NAME, DS_SCOPE, DS_KEY, 1)
-			:await()
-			:unwrap()
-			:text()
-			:unwrap()
+		orderedDatastoresScopesEntriesEntry.patch(UNIVERSE_ID, DS_NAME, DS_SCOPE, DS_KEY, 1):await():unwrap()
 	)}`
 )
 
 print(
 	`got ordered-datastore entry: {err.displayAsJson(
-		orderedDatastoresScopesEntriesEntry
-			.get(UNIVERSE_ID, DS_NAME, DS_SCOPE, DS_KEY)
-			:await()
-			:unwrap()
-			:text()
-			:unwrap()
+		orderedDatastoresScopesEntriesEntry.get(UNIVERSE_ID, DS_NAME, DS_SCOPE, DS_KEY):await():unwrap()
 	)}`
 )
 
@@ -82,18 +65,11 @@ print(
 			.post(UNIVERSE_ID, DS_NAME, DS_SCOPE, DS_KEY, 1)
 			:await()
 			:unwrap()
-			:text()
-			:unwrap()
 	)}`
 )
 
 print(
 	`deleted ordered-datastore increment entry: {err.displayAsJson(
-		orderedDatastoresScopesEntriesEntry
-			.delete(UNIVERSE_ID, DS_NAME, DS_SCOPE, DS_KEY)
-			:await()
-			:unwrap()
-			:text()
-			:unwrap()
+		orderedDatastoresScopesEntriesEntry.delete(UNIVERSE_ID, DS_NAME, DS_SCOPE, DS_KEY):await():unwrap()
 	)}`
 )

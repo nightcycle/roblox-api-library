@@ -29,8 +29,6 @@ local createdAsset = assets
 	.post("Decal", "image/png", "png test", "png test", "Group", GROUP_ID, fs.readFile(PNG_PATH))
 	:await()
 	:unwrap()
-	:json()
-	:unwrap()
 
 print(`saved png image: {err.displayAsJson(createdAsset)}`)
 local assetId: option.Option<number> = option.none()
@@ -38,7 +36,7 @@ do
 	local operationId = createdAsset["operationId"]
 	while true do
 		luneUtil.Task.wait(0.1)
-		local operationData = assetsOperations.get(operationId):await():unwrap():json():unwrap()
+		local operationData = assetsOperations.get(operationId):await():unwrap()
 		print(`operation: {err.displayAsJson(operationData)}`)
 		if operationData["done"] then
 			assetId = option.from(tonumber(operationData["response"]["assetId"]))
@@ -62,13 +60,11 @@ do
 		)
 		:await()
 		:unwrap()
-		:json()
-		:unwrap()
 	print(`updated asset info: {err.displayAsJson(updateAsset)}`)
 	local operationId = updateAsset["operationId"]
 	while true do
 		luneUtil.Task.wait(0.1)
-		local operationData = assetsOperations.get(operationId):await():unwrap():json():unwrap()
+		local operationData = assetsOperations.get(operationId):await():unwrap()
 		print(`operation: {err.displayAsJson(operationData)}`)
 		if operationData["done"] then
 			break
@@ -79,7 +75,7 @@ end
 if TRY_PATCH_CONTENT then
 	local updateAsset = assetsAsset
 		.patch(
-			ASSET_ID,
+			assetId:expect(`assetId is not set`),
 			option.some(fs.readFile(PNG_ALT_PATH) :: string | buffer),
 			option.none(),
 			option.none(),
@@ -87,13 +83,11 @@ if TRY_PATCH_CONTENT then
 		)
 		:await()
 		:unwrap()
-		:json()
-		:unwrap()
 	print(`update png image: {err.displayAsJson(updateAsset)}`)
 	local operationId = updateAsset["operationId"]
 	while true do
 		luneUtil.Task.wait(0.1)
-		local operationData = assetsOperations.get(operationId):await():unwrap():json():unwrap()
+		local operationData = assetsOperations.get(operationId):await():unwrap()
 		print(`operation: {err.displayAsJson(operationData)}`)
 		if operationData["done"] then
 			break
@@ -102,13 +96,19 @@ if TRY_PATCH_CONTENT then
 end
 
 do
-	local archivedAsset =
-		assetsAssetArchive.post(assetId:expect(`assetId is not set`)):await():unwrap():json():unwrap()
+	local archivedAsset = assetsAssetArchive.post(assetId:expect(`assetId is not set`)):await():unwrap()
 	print(`archived asset: {err.displayAsJson(archivedAsset)}`)
 end
 
 do
-	local restoredAsset =
-		restoredAssetArchive.post(assetId:expect(`assetId is not set`)):await():unwrap():json():unwrap()
+	local restoredAsset = restoredAssetArchive.post(assetId:expect(`assetId is not set`)):await():unwrap()
 	print(`restoring asset: {err.displayAsJson(restoredAsset)}`)
+end
+
+do
+	local assetVersions = assetsAssetVersions
+		.get(assetId:expect(`assetId is not set`), option.none(), option.none())
+		:await()
+		:unwrap()
+	print(`getting asset versions: {err.displayAsJson(assetVersions)}`)
 end

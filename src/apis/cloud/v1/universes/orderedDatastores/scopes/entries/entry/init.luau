@@ -43,11 +43,8 @@ function Util.get(
 	path: string,
 	id: string,
 	value: number,
-}>, Response<{
-	code: string,
-	message: string,
-}>>>
-	return future.from(function(): any
+}>, Response<unknown>>>
+	return future.from(function()
 		return client
 			.fromAPIKey()
 			:get(
@@ -61,43 +58,9 @@ function Util.get(
 			:send()
 			:await()
 			:match(function(ok)
-				return result.ok(ok)
+				return result.ok(ok:json():unwrap())
 			end, function(eResponse)
-				local eBuilder = eResponse:builder()
-				return eResponse:json():match(function(e)
-					if e["errors"] then
-						local eCount = #e["errors"]
-						if eCount == 1 then
-							local e2 = e["errors"][1]
-							return result.err(eBuilder
-								:body(reqwest.Body.fromJson({
-									code = "UnknownError",
-									message = e2["message"],
-								}))
-								:build())
-						end
-					elseif typeof(e["code"]) == "string" and typeof(e["message"]) == "string" then
-						return result.err(eBuilder
-							:body(reqwest.Body.fromJson({
-								code = e["code"],
-								message = e["message"],
-							}))
-							:build())
-					end
-					return result.err(eBuilder
-						:body(reqwest.Body.fromJson({
-							code = "UnknownError",
-							message = err.displayAsJson(e) :: any,
-						}))
-						:build())
-				end, function(e)
-					return result.err(eBuilder
-						:body(reqwest.Body.fromJson({
-							code = "UnknownError",
-							message = err.displayAsJson(e :: any),
-						}))
-						:build())
-				end)
+				return result.err(eResponse)
 			end)
 	end)
 end
@@ -108,15 +71,12 @@ function Util.patch(
 	scope: string,
 	entryKey: string,
 	value: number
-): Future<Result<Response<{
+): Future<Result<{
 	path: string,
 	id: string,
 	value: number,
-}>, Response<{
-	code: string,
-	message: string,
-}>>>
-	return future.from(function(): any
+}, Response<unknown>>>
+	return future.from(function()
 		return client
 			.fromAPIKey()
 			:patch(
@@ -133,43 +93,9 @@ function Util.patch(
 			:send()
 			:await()
 			:match(function(ok)
-				return result.ok(ok)
+				return result.ok(ok:json():unwrap())
 			end, function(eResponse)
-				local eBuilder = eResponse:builder()
-				return eResponse:json():match(function(e)
-					if e["errors"] then
-						local eCount = #e["errors"]
-						if eCount == 1 then
-							local e2 = e["errors"][1]
-							return result.err(eBuilder
-								:body(reqwest.Body.fromJson({
-									code = "UnknownError",
-									message = e2["message"],
-								}))
-								:build())
-						end
-					elseif typeof(e["code"]) == "string" and typeof(e["message"]) == "string" then
-						return result.err(eBuilder
-							:body(reqwest.Body.fromJson({
-								code = e["code"],
-								message = e["message"],
-							}))
-							:build())
-					end
-					return result.err(eBuilder
-						:body(reqwest.Body.fromJson({
-							code = "UnknownError",
-							message = err.displayAsJson(e) :: any,
-						}))
-						:build())
-				end, function(e)
-					return result.err(eBuilder
-						:body(reqwest.Body.fromJson({
-							code = "UnknownError",
-							message = err.displayAsJson(e :: any),
-						}))
-						:build())
-				end)
+				return result.err(eResponse)
 			end)
 	end)
 end
@@ -179,8 +105,8 @@ function Util.delete(
 	datastoreName: string,
 	scope: string,
 	entryKey: string
-): Future<Result<Response<string>, Response<{}>>>
-	return future.from(function(): any
+): Future<Result<string, Response<unknown>>>
+	return future.from(function()
 		return client
 			.fromAPIKey()
 			:delete(
@@ -194,43 +120,9 @@ function Util.delete(
 			:send()
 			:await()
 			:match(function(ok)
-				return result.ok(ok)
+				return result.ok(ok:text():unwrap())
 			end, function(eResponse)
-				local eBuilder = eResponse:builder()
-				return eResponse:json():match(function(e)
-					if e["errors"] then
-						local eCount = #e["errors"]
-						if eCount == 1 then
-							local e2 = e["errors"][1]
-							return result.err(eBuilder
-								:body(reqwest.Body.fromJson({
-									code = "UnknownError",
-									message = e2["message"],
-								}))
-								:build())
-						end
-					elseif typeof(e["code"]) == "string" and typeof(e["message"]) == "string" then
-						return result.err(eBuilder
-							:body(reqwest.Body.fromJson({
-								code = e["code"],
-								message = e["message"],
-							}))
-							:build())
-					end
-					return result.err(eBuilder
-						:body(reqwest.Body.fromJson({
-							code = "UnknownError",
-							message = err.displayAsJson(e) :: any,
-						}))
-						:build())
-				end, function(e)
-					return result.err(eBuilder
-						:body(reqwest.Body.fromJson({
-							code = "UnknownError",
-							message = err.displayAsJson(e :: any),
-						}))
-						:build())
-				end)
+				return result.err(eResponse)
 			end)
 	end)
 end

@@ -53,11 +53,8 @@ function Util.get(
 		guildedSocialLink: true?,
 		devForumSocialLink: true?,
 	}
-): Future<Result<Response<operations.OperationData>, Response<{
-	code: string,
-	message: string,
-}>>>
-	return future.from(function(): any
+): Future<Result<operations.OperationData, Response<unknown>>>
+	return future.from(function()
 		return client
 			.fromAPIKey()
 			:get(reqwest.Url.from(CONSTANTS.OPEN_CLOUD_BASE_URL .. `/assets/v1/assets/{assetId}`, {
@@ -67,27 +64,9 @@ function Util.get(
 			:send()
 			:await()
 			:match(function(ok)
-				return result.ok(ok)
+				return result.ok(ok:json():unwrap())
 			end, function(e)
-				if e["errors"] then
-					local eCount = #e["errors"]
-					if eCount == 1 then
-						local e2 = e["errors"][1]
-						return result.err({
-							code = "UnknownError",
-							message = e2["message"],
-						})
-					end
-				elseif typeof(e["code"]) == "string" and typeof(e["message"]) == "string" then
-					return result.err({
-						code = e["code"],
-						message = e["message"],
-					})
-				end
-				return result.err({
-					code = "UnknownError",
-					message = err.displayAsJson(e),
-				})
+				return result.err(e)
 			end)
 	end)
 end
@@ -112,10 +91,7 @@ function Util.patch(
 		guildedSocialLink: operations.SocialData?,
 		devForumSocialLink: operations.SocialData?,
 	}>
-): Future<Result<Response<operations.OperationData>, Response<{
-	code: string,
-	message: string,
-}>>>
+): Future<Result<operations.OperationData, Response<unknown>>>
 	local updateMask: { string } = {}
 
 	local fields = hashMap.fromMut({})
@@ -191,27 +167,9 @@ function Util.patch(
 			:build()
 
 		return request:send():await():match(function(ok)
-			return result.ok(ok)
+			return result.ok(ok:json():unwrap())
 		end, function(e)
-			if e["errors"] then
-				local eCount = #e["errors"]
-				if eCount == 1 then
-					local e2 = e["errors"][1]
-					return result.err({
-						code = "UnknownError",
-						message = e2["message"],
-					})
-				end
-			elseif typeof(e["code"]) == "string" and typeof(e["message"]) == "string" then
-				return result.err({
-					code = e["code"],
-					message = e["message"],
-				})
-			end
-			return result.err({
-				code = "UnknownError",
-				message = err.displayAsJson(e),
-			})
+			return result.err(e)
 		end)
 	end)
 end

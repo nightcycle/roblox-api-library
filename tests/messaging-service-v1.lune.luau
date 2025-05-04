@@ -16,7 +16,5 @@ local MESSAGE = "test-message"
 -- Private Functions
 -- Class
 print(
-	`sent message: {err.displayAsJson(
-		messagingService.post(UNIVERSE_ID, TOPIC, MESSAGE):await():unwrap():text():unwrap()
-	)}`
+	`sent message: {err.displayAsJson(messagingService.post(UNIVERSE_ID, TOPIC, MESSAGE):await():unwrap())}`
 )
