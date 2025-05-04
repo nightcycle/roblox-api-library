@@ -44,6 +44,38 @@ export type PreviewData = {
 	asset: string,
 	altText: string?,
 }
+export type Object = {
+	["@type"]: string,
+	path: string,
+	revisionCreateTime: string,
+	revisionId: string,
+	assetType: AssetType,
+	displayName: string,
+	state: "Active" | string,
+	assetId: string,
+	moderationResult: {
+		moderationState: "Approved" | "Archived",
+	},
+	creationContext: {
+		creator: {
+			groupId: string,
+		} | {
+			userId: string,
+		},
+		description: string,
+	},
+	socialLink: {
+		facebookSocialLink: string?,
+		twitterSocialLink: string?,
+		youtubeSocialLink: string?,
+		twitchSocialLink: string?,
+		discordSocialLink: string?,
+		githubSocialLink: string?,
+		robloxSocialLink: string?,
+		guildedSocialLink: string?,
+		devForumSocialLink: string?,
+	}?,
+}
 export type OperationData = {
 	path: string,
 	done: false,
@@ -54,27 +86,7 @@ export type OperationData = {
 	done: true,
 	operationId: string,
 	metadata: unknown?,
-	response: {
-		["@type"]: string,
-		path: string,
-		revisionCreateTime: string,
-		revisionId: string,
-		assetType: AssetType,
-		displayName: string,
-		state: "Active" | string,
-		assetId: string,
-		moderationResult: {
-			moderationState: "Approved" | string,
-		},
-		creationContext: {
-			creator: {
-				groupId: string,
-			} | {
-				userId: string,
-			},
-			description: string,
-		},
-	},
+	response: Object,
 } | {
 	path: string,
 	done: true,

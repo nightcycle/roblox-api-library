@@ -32,31 +32,19 @@ local Util = {}
 
 function Util.get(
 	assetId: number,
-	readMask: {
-		description: true?,
-		displayName: true?,
-		icon: true?,
-		previews: true?,
-		facebookSocialLink: true?,
-		twitterSocialLink: true?,
-		youtubeSocialLink: true?,
-		twitchSocialLink: true?,
-		discordSocialLink: true?,
-		githubSocialLink: true?,
-		robloxSocialLink: true?,
-		guildedSocialLink: true?,
-		devForumSocialLink: true?,
-	}
-): Future<Result<Response<operations.OperationData>, Response<{
+	versionNumber: number
+): Future<Result<Response<operations.Object>, Response<{
 	code: string,
 	message: string,
 }>>>
 	return future.from(function(): any
 		return client
 			.fromAPIKey()
-			:get(reqwest.Url.from(CONSTANTS.OPEN_CLOUD_BASE_URL .. `/assets/v1/assets/{assetId}`, {
-				readMask = table.concat(hashMap.from(readMask):intoKeys():drain(), "%2C"),
-			}))
+			:get(
+				reqwest.Url.from(
+					CONSTANTS.OPEN_CLOUD_BASE_URL .. `/assets/v1/assets/{assetId}/versions/{versionNumber}`
+				)
+			)
 			:build()
 			:send()
 			:await()

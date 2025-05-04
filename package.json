@@ -20,7 +20,7 @@
 		"@nightcycle/hash-map": "^0",
 		"@nightcycle/vec-deque": "^0",
 		"@nightcycle/vec": "^0",
-		"@nightcycle/lune-util": "^0.6",
+		"@nightcycle/lune-util": "0.7",
 		"@nightcycle/serde-json": "^0",
 		"@nightcycle/reqwest": "^0",
 		"@nightcycle/hashlib": "^1"

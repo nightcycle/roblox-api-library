@@ -34,11 +34,16 @@ function Util.get(
 	assetId: number,
 	maxPageSize: Option<number>,
 	pageToken: Option<string>
-): Future<Result<Response<operations.OperationData>, Response<{ unknown }>>>
+): Future<Result<Response<{
+	assetVersions: { operations.Object },
+}>, Response<{
+	code: string,
+	message: string,
+}>>>
 	return future.from(function(): any
 		return client
 			.fromAPIKey()
-			:get(reqwest.Url.from(CONSTANTS.OPEN_CLOUD_BASE_URL .. `/assets/v1/assets/{assetId}`, {
+			:get(reqwest.Url.from(CONSTANTS.OPEN_CLOUD_BASE_URL .. `/assets/v1/assets/{assetId}/versions`, {
 				maxPageSize = maxPageSize:asNullable() :: any,
 				pageToken = pageToken:asNullable(),
 			}))

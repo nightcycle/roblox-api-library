@@ -120,6 +120,10 @@ function Util.patch(
 
 	local fields = hashMap.fromMut({})
 
+	if content:isSome() then
+		error("Wasn't ever able to get patch content to work, so this is disabled for now")
+	end
+
 	info:inspect(function(v)
 		if v["displayName"] then
 			table.insert(updateMask, "displayName")
@@ -159,51 +163,56 @@ function Util.patch(
 	end)
 
 	local files = hashMap.fromMut({})
+
 	content:inspect(function(v)
 		files:insert("fileContent", {
-			fileName = `file`,
-			contentType = `application/octet-stream`,
+			fileName = `file.png`,
 			data = if typeof(v) == "buffer" then buffer.tostring(v) else v,
 		})
 	end)
+
+	if fields:get("request"):isNone() then
+		fields:insert("request", {
+			assetId = math.round(assetId),
+		})
+	end
 
 	local body = reqwest.Body.fromForm(fields:freeze(), files:freeze(), option.none())
 	local form = body:asForm():unwrap()
 
 	return future.from(function(): any
-		return client
+		local request = client
 			.fromAPIKey()
 			:patch(reqwest.Url.from(CONSTANTS.OPEN_CLOUD_BASE_URL .. `/assets/v1/assets/{assetId}`, {
-				updateMask = table.concat(updateMask, "%2C"),
+				updateMask = if #updateMask > 0 then table.concat(updateMask, "%2C") else nil,
 			}))
 			:body(body)
 			:header("Content-Type", `multipart/form-data; boundary={form.boundary}`)
 			:build()
-			:send()
-			:await()
-			:match(function(ok)
-				return result.ok(ok)
-			end, function(e)
-				if e["errors"] then
-					local eCount = #e["errors"]
-					if eCount == 1 then
-						local e2 = e["errors"][1]
-						return result.err({
-							code = "UnknownError",
-							message = e2["message"],
-						})
-					end
-				elseif typeof(e["code"]) == "string" and typeof(e["message"]) == "string" then
+
+		return request:send():await():match(function(ok)
+			return result.ok(ok)
+		end, function(e)
+			if e["errors"] then
+				local eCount = #e["errors"]
+				if eCount == 1 then
+					local e2 = e["errors"][1]
 					return result.err({
-						code = e["code"],
-						message = e["message"],
+						code = "UnknownError",
+						message = e2["message"],
 					})
 				end
+			elseif typeof(e["code"]) == "string" and typeof(e["message"]) == "string" then
 				return result.err({
-					code = "UnknownError",
-					message = err.displayAsJson(e),
+					code = e["code"],
+					message = e["message"],
 				})
-			end)
+			end
+			return result.err({
+				code = "UnknownError",
+				message = err.displayAsJson(e),
+			})
+		end)
 	end)
 end
 

@@ -9,30 +9,63 @@ local option = require("@pkg/@nightcycle/option")
 local assets = require("../src/apis/cloud/v1/assets")
 local assetsOperations = require("../src/apis/cloud/v1/assets/operations")
 local assetsAsset = require("../src/apis/cloud/v1/assets/asset")
+local assetsAssetArchive = require("../src/apis/cloud/v1/assets/asset/archive")
+local restoredAssetArchive = require("../src/apis/cloud/v1/assets/asset/restore")
+local assetsAssetVersions = require("../src/apis/cloud/v1/assets/asset/versions")
 
 -- Types
 -- Constants
 local GROUP_ID = tonumber(luneUtil.Env["GROUP_ID"]:expect(`GROUP_ID is not set`))
 assert(GROUP_ID, "GROUP_ID is not a number")
-local CREATE_ENABLED = false
+local TRY_PATCH_CONTENT = false
 local PNG_PATH = "tests/data/image.png"
--- local BMP_PATH = "tests/data/image.bmp"
--- local JPEG_PATH = "tests/data/image.jpg"
--- local TGA_PATH = "tests/data/image.tga"
-local ASSET_ID = 135498858258730
+local PNG_ALT_PATH = "tests/data/image-alt.png"
+
 -- Variables
 -- References
 -- Private Functions
 -- Class
-if CREATE_ENABLED then
-	local createdAsset = assets
-		.post("Decal", "image/png", "png test", "png test", "Group", GROUP_ID, fs.readFile(PNG_PATH))
+local createdAsset = assets
+	.post("Decal", "image/png", "png test", "png test", "Group", GROUP_ID, fs.readFile(PNG_PATH))
+	:await()
+	:unwrap()
+	:json()
+	:unwrap()
+
+print(`saved png image: {err.displayAsJson(createdAsset)}`)
+local assetId: option.Option<number> = option.none()
+do
+	local operationId = createdAsset["operationId"]
+	while true do
+		luneUtil.Task.wait(0.1)
+		local operationData = assetsOperations.get(operationId):await():unwrap():json():unwrap()
+		print(`operation: {err.displayAsJson(operationData)}`)
+		if operationData["done"] then
+			assetId = option.from(tonumber(operationData["response"]["assetId"]))
+			break
+		end
+	end
+end
+
+do
+	local updateAsset = assetsAsset
+		.patch(
+			assetId:expect(`assetId is not set`),
+			option.none(),
+			option.some({
+				icon = nil :: string?,
+				displayName = "updated name" :: string?,
+				description = "updated description" :: string?,
+			}),
+			option.none(),
+			option.none()
+		)
 		:await()
 		:unwrap()
 		:json()
 		:unwrap()
-	print(`saved png image: {err.displayAsJson(createdAsset)}`)
-	local operationId = createdAsset["operationId"]
+	print(`updated asset info: {err.displayAsJson(updateAsset)}`)
+	local operationId = updateAsset["operationId"]
 	while true do
 		luneUtil.Task.wait(0.1)
 		local operationData = assetsOperations.get(operationId):await():unwrap():json():unwrap()
@@ -43,32 +76,11 @@ if CREATE_ENABLED then
 	end
 end
 
-print(`getting asset: {err.displayAsJson(assetsAsset
-	.get(2971874773, {
-		description = true,
-		displayName = true,
-		icon = true,
-		previews = true,
-		facebookSocialLink = true,
-		twitterSocialLink = true,
-		youtubeSocialLink = true,
-		twitchSocialLink = true,
-		discordSocialLink = true,
-		githubSocialLink = true,
-		robloxSocialLink = true,
-		guildedSocialLink = true,
-		devForumSocialLink = true,
-	})
-	:await()
-	:unwrap()
-	:text()
-	:unwrap())}`)
-
-do
+if TRY_PATCH_CONTENT then
 	local updateAsset = assetsAsset
 		.patch(
 			ASSET_ID,
-			option.some(fs.readFile(PNG_PATH) :: string | buffer),
+			option.some(fs.readFile(PNG_ALT_PATH) :: string | buffer),
 			option.none(),
 			option.none(),
 			option.none()
@@ -77,7 +89,7 @@ do
 		:unwrap()
 		:json()
 		:unwrap()
-	print(`saved png image: {err.displayAsJson(updateAsset)}`)
+	print(`update png image: {err.displayAsJson(updateAsset)}`)
 	local operationId = updateAsset["operationId"]
 	while true do
 		luneUtil.Task.wait(0.1)
@@ -87,4 +99,16 @@ do
 			break
 		end
 	end
+end
+
+do
+	local archivedAsset =
+		assetsAssetArchive.post(assetId:expect(`assetId is not set`)):await():unwrap():json():unwrap()
+	print(`archived asset: {err.displayAsJson(archivedAsset)}`)
+end
+
+do
+	local restoredAsset =
+		restoredAssetArchive.post(assetId:expect(`assetId is not set`)):await():unwrap():json():unwrap()
+	print(`restoring asset: {err.displayAsJson(restoredAsset)}`)
 end
