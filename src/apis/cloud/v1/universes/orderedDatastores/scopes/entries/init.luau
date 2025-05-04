@@ -38,6 +38,7 @@ type DataStoreEntryValue =
 
 -- Class
 local Util = {}
+Util.entry = require("./entry")
 
 function Util.post(
 	universeId: number,

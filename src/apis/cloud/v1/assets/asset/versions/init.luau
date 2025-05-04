@@ -30,6 +30,8 @@ type Response<B> = reqwest.Response<B>
 -- Class
 local Util = {}
 
+Util.rollback = require("./rollback")
+Util.version = require("./version")
 function Util.get(
 	assetId: number,
 	maxPageSize: Option<number>,

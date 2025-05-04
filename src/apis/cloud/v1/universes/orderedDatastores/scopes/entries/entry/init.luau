@@ -33,6 +33,7 @@ type CompatDateTime = luneUtil.CompatDateTime
 
 -- Class
 local Util = {}
+Util.increment = require("./increment")
 
 function Util.get(
 	universeId: number,

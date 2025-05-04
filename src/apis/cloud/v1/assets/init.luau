@@ -30,7 +30,8 @@ type Response<B> = reqwest.Response<B>
 
 -- Class
 local Util = {}
-
+Util.asset = require("./asset")
+Util.operations = operations
 function Util.post(
 	assetType: operations.AssetType,
 	contentType: operations.ContentType,
