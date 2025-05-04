@@ -24,32 +24,29 @@ type VecDeque<V> = vecDeque.VecDeque<V>
 type Error<V, B> = err.Error<V, B>
 type Response<B> = reqwest.Response<B>
 
+-- Constants
+local DID_YOU_FIGURE_THIS_OUT = false
 -- Private Functions
 
 -- Class
 local Util = {}
+Util.places = require("./places")
 
-function Util.post(universeId: number, topic: string, message: string): Future<Result<"", Response<unknown>>>
+function Util.post<V>(universeId: number): Future<Result<{}, Response<unknown>>>
+	assert(DID_YOU_FIGURE_THIS_OUT, `This API is not yet implemented`)
 	return future.from(function()
 		return client
 			.fromAPIKey()
-			:post(
-				reqwest.Url.from(
-					CONSTANTS.OPEN_CLOUD_BASE_URL
-						.. `/messaging-service/v1/universes/{universeId}/topics/{topic}`
-				)
-			)
-			:body(reqwest.Body.fromJson({
-				message = message,
-			}))
+			:post(CONSTANTS.OPEN_CLOUD_BASE_URL .. `/cloud/v2/universes/{universeId}:restartServers`)
 			:header("Content-Type", "application/json")
+			:body(reqwest.Body.fromJson({}))
 			:build()
 			:send()
 			:await()
-			:match(function(ok)
-				return result.ok(ok:text():unwrap())
-			end, function(eResponse)
-				return result.err(eResponse)
+			:match(function(response)
+				return result.ok(response:text():unwrap())
+			end, function(response)
+				return result.err(response)
 			end)
 	end)
 end

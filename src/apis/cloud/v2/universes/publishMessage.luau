@@ -24,32 +24,31 @@ type VecDeque<V> = vecDeque.VecDeque<V>
 type Error<V, B> = err.Error<V, B>
 type Response<B> = reqwest.Response<B>
 
+-- Constants
+
 -- Private Functions
 
 -- Class
 local Util = {}
+Util.places = require("./places")
 
-function Util.post(universeId: number, topic: string, message: string): Future<Result<"", Response<unknown>>>
+function Util.post<V>(universeId: number, topic: string, message: string): Future<Result<{}, Response<unknown>>>
 	return future.from(function()
 		return client
 			.fromAPIKey()
-			:post(
-				reqwest.Url.from(
-					CONSTANTS.OPEN_CLOUD_BASE_URL
-						.. `/messaging-service/v1/universes/{universeId}/topics/{topic}`
-				)
-			)
+			:post(CONSTANTS.OPEN_CLOUD_BASE_URL .. `/cloud/v2/universes/{universeId}:publishMessage`)
+			:header("Content-Type", "application/json")
 			:body(reqwest.Body.fromJson({
+				topic = topic,
 				message = message,
 			}))
-			:header("Content-Type", "application/json")
 			:build()
 			:send()
 			:await()
-			:match(function(ok)
-				return result.ok(ok:text():unwrap())
-			end, function(eResponse)
-				return result.err(eResponse)
+			:match(function(response)
+				return result.ok(response:json():unwrap())
+			end, function(response)
+				return result.err(response)
 			end)
 	end)
 end
