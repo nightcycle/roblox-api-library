@@ -62,7 +62,7 @@ function Util.post(
 						.. `/ordered-data-stores/v1/universes/{universeId}/orderedDataStores/{datastoreName}/scopes/{scope}/entries`,
 					{
 						id = entryKey,
-					}
+					} :: any
 				)
 			)
 			:header("Content-Type", "application/json")
@@ -155,7 +155,7 @@ function Util.get(
 								return nil
 							end)
 						end),
-					}
+					} :: any
 				)
 			)
 			:header("Content-Type", "application/json")

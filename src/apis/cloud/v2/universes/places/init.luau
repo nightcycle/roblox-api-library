@@ -87,7 +87,7 @@ function Util.patch<V>(
 					CONSTANTS.OPEN_CLOUD_BASE_URL .. `/cloud/v2/universes/{universeId}/places/{placeId}`,
 					{
 						updateMask = table.concat(hashMap.from(data):intoKeys():drain(), "%2C"),
-					}
+					} :: any
 				)
 			)
 			:header("Content-Type", "application/json")

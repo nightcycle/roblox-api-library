@@ -74,7 +74,7 @@ function Util.get(
 							return nil
 						end),
 						scope = scope:unwrapOr("global") :: string,
-					}
+					} :: any
 				)
 			)
 			:build()

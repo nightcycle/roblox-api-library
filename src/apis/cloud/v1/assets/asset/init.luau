@@ -57,9 +57,12 @@ function Util.get(
 	return future.from(function()
 		return client
 			.fromAPIKey()
-			:get(reqwest.Url.from(CONSTANTS.OPEN_CLOUD_BASE_URL .. `/assets/v1/assets/{assetId}`, {
-				readMask = table.concat(hashMap.from(readMask):intoKeys():drain(), "%2C"),
-			}))
+			:get(reqwest.Url.from(
+				CONSTANTS.OPEN_CLOUD_BASE_URL .. `/assets/v1/assets/{assetId}`,
+				{
+					readMask = table.concat(hashMap.from(readMask):intoKeys():drain(), "%2C"),
+				} :: any
+			))
 			:build()
 			:send()
 			:await()
@@ -159,9 +162,12 @@ function Util.patch(
 	return future.from(function()
 		local request = client
 			.fromAPIKey()
-			:patch(reqwest.Url.from(CONSTANTS.OPEN_CLOUD_BASE_URL .. `/assets/v1/assets/{assetId}`, {
-				updateMask = if #updateMask > 0 then table.concat(updateMask, "%2C") else nil,
-			}))
+			:patch(reqwest.Url.from(
+				CONSTANTS.OPEN_CLOUD_BASE_URL .. `/assets/v1/assets/{assetId}`,
+				{
+					updateMask = if #updateMask > 0 then table.concat(updateMask, "%2C") else nil,
+				} :: any
+			))
 			:body(body)
 			:header("Content-Type", `multipart/form-data; boundary={form.boundary}`)
 			:build()

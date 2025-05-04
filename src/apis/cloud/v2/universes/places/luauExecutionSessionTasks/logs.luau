@@ -55,11 +55,14 @@ function Util.get<V>(
 	return future.from(function()
 		return client
 			.fromAPIKey()
-			:get(reqwest.Url.from(CONSTANTS.OPEN_CLOUD_BASE_URL .. `/cloud/v2/` .. path .. "/logs", {
-				maxPageSize = maxPageSize:asNullable() :: any,
-				pageToken = pageToken:asNullable(),
-				view = view :: string,
-			}))
+			:get(reqwest.Url.from(
+				CONSTANTS.OPEN_CLOUD_BASE_URL .. `/cloud/v2/` .. path .. "/logs",
+				{
+					maxPageSize = maxPageSize:asNullable() :: any,
+					pageToken = pageToken:asNullable(),
+					view = view :: string,
+				} :: any
+			))
 			:header("Content-Type", "application/json")
 			:build()
 			:send()

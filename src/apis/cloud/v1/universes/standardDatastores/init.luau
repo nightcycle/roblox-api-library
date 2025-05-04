@@ -49,7 +49,7 @@ function Util.get(
 							return nil
 						end),
 						prefix = prefix:asNullable(),
-					}
+					} :: any
 				)
 			)
 			:build()

@@ -136,9 +136,12 @@ function Util.patch<V>(universeId: number, data: PartialUniverse): Future<Result
 	return future.from(function()
 		return client
 			.fromAPIKey()
-			:patch(reqwest.Url.from(CONSTANTS.OPEN_CLOUD_BASE_URL .. `/cloud/v2/universes/{universeId}`, {
-				updateMask = table.concat(hashMap.from(data):intoKeys():drain(), "%2C"),
-			}))
+			:patch(reqwest.Url.from(
+				CONSTANTS.OPEN_CLOUD_BASE_URL .. `/cloud/v2/universes/{universeId}`,
+				{
+					updateMask = table.concat(hashMap.from(data):intoKeys():drain(), "%2C"),
+				} :: any
+			))
 			:header("Content-Type", "application/json")
 			:body(reqwest.Body.fromJson(data))
 			:build()

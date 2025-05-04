@@ -1,6 +1,5 @@
 #!/bin/sh
 set -e
-
 is_wally=false
 
 for arg in "$@"

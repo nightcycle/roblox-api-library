@@ -7,7 +7,15 @@ on:
 jobs:
   get_published_release:
     runs-on: ubuntu-latest
-
+    strategy:
+      matrix:
+        package: [
+          "cloud-v1-universes",
+          "cloud-v1-assets",
+          "cloud-v2-universes",
+        ]
+    env:
+      PACKAGE: ${{ matrix.package }}
     outputs:
       release_id: ${{ steps.release_info.outputs.release_id }}
       upload_url: ${{ steps.release_info.outputs.upload_url }}
@@ -29,7 +37,7 @@ jobs:
           repo_name=${{ github.repository }}
           forward_repo_pattern="${repo_owner_name}/"
           empty_str=""
-          repo_name="${repo_name/${forward_repo_pattern}/${empty_str}}"
+          repo_name="rbx-web-api-${{env.PACKAGE}}"
           echo "::set-output name=repo_name::$repo_name"
 
           # Use the GitHub API to fetch the repository description

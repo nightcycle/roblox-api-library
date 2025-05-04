@@ -5,6 +5,15 @@ DARKLUA_CONFIG=".darklua.json"
 SOURCEMAP="darklua-sourcemap.json"
 MODEL_ROJO_CONFIG="model.project.json"
 LSP_SETTINGS=".luau-analyze.json"
+API_PATH="$1"
+if [ -z "$API_PATH" ]; then
+  echo "Need to supply api path"
+  exit 1
+fi
+# replace "-" with "/" for API_PATH
+API_PATH=${API_PATH//-//}
+echo "API_PATH: $API_PATH"
+
 # get if any of the arguments were "--serve"
 build_dir="build"
 is_wally=false
@@ -46,6 +55,7 @@ cp -r "$MODEL_ROJO_CONFIG" "$build_dir/$MODEL_ROJO_CONFIG"
 cp -r "$DARKLUA_CONFIG" "$build_dir/$DARKLUA_CONFIG"
 cp -r "default.project.json" "$build_dir/default.project.json"
 
+
 if [ "$is_wally" = true ]; then
 	cp -r "wally.toml" "$build_dir/wally.toml"
 	cp -r "rokit.toml" "$build_dir/rokit.toml"
@@ -55,6 +65,10 @@ fi
 if [ -d "stage-src" ]; then
 	rm -rf "stage-src"
 fi
+
+cat <<EOF > "src/init.luau"
+return require("./apis/$API_PATH")
+EOF
 
 cp -r "src" "stage-src"
 

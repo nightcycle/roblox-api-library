@@ -10,14 +10,17 @@ jobs:
 
     strategy:
       matrix:
-        scene: [main]
-        include:
-          - name: main
+        package: [
+          "cloud-v1-universes",
+          "cloud-v1-assets",
+          "cloud-v2-universes",
+        ]
 
     env:
       LC_ALL: C.UTF-8
       LANG: C.UTF-8
       ROJO_CONFIG: "dev.project.json"
+      PACKAGE: ${{ matrix.package }}
     steps:
       - uses: actions/checkout@v2
 
@@ -25,9 +28,7 @@ jobs:
         uses: CompeyDev/setup-rokit@v0.1.2
       - name: set-up lune
         run: lune setup
-
       - name: install wally
         run: sh scripts/wally-install.sh "${{env.ROJO_CONFIG}}"
-
       - name: validate project
-        run: sh scripts/validate.sh "${{env.ROJO_CONFIG}}" --wally
+        run: sh scripts/validate.sh "${{env.PACKAGE}}" --wally

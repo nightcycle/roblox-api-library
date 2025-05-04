@@ -45,7 +45,7 @@ function Util.post(
 					CONSTANTS.OPEN_CLOUD_BASE_URL .. `/universes/v1/{universeId}/places/{placeId}/versions`,
 					{
 						versionType = versionType :: string,
-					}
+					} :: any
 				)
 			)
 			:body(

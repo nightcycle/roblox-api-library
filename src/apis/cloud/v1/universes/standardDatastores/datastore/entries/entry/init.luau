@@ -59,7 +59,7 @@ function Util.get(
 						datastoreName = datastoreName,
 						entryKey = entryKey,
 						scope = scope:unwrapOr("global"),
-					}
+					} :: any
 				)
 			)
 			:header("Content-Type", "application/x-www-form-urlencoded")
@@ -148,7 +148,7 @@ function Util.post(
 						scope = scope:unwrapOr("global"),
 						matchVersion = matchVersion:asNullable() :: any,
 						exclusiveCreate = exclusiveCreate:asNullable() :: any,
-					}
+					} :: any
 				)
 			)
 			:header("Content-Type", "application/json")
@@ -246,7 +246,7 @@ function Util.delete(
 						datastoreName = datastoreName,
 						entryKey = entryKey,
 						scope = scope:unwrapOr("global"),
-					}
+					} :: any
 				)
 			)
 			:header("Content-Type", "application/json")

@@ -55,7 +55,7 @@ function Util.get(
 					{
 						maxPageSize = maxPageSize:asNullable() :: any,
 						pageToken = pageToken:asNullable(),
-					}
+					} :: any
 				)
 			)
 			:header("Content-Type", "application/json")

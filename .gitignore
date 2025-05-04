@@ -12,6 +12,7 @@ sourcemap.json
 darklua-sourcemap.json
 wally.lock
 keys.txt
+src/init.luau
 
 # File types
 *.lock

@@ -44,7 +44,7 @@ function Util.post(
 			)
 			:body(reqwest.Body.fromJson({
 				assetVersion = `assets/{assetId}/versions/{versionNumber}`,
-			}))
+			} :: any))
 			:header("Content-Type", "application/json")
 			:build()
 			:send()

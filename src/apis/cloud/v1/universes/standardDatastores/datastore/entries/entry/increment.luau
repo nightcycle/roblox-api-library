@@ -66,7 +66,7 @@ function Util.post(
 							return nil
 						end),
 						incrementBy = tostring(delta),
-					}
+					} :: any
 				)
 			)
 			:header("Content-Type", "application/json")

@@ -72,7 +72,7 @@ function Util.get(
 						end),
 						sortOrder = sortOrder,
 						limit = limit:asNullable(),
-					} :: { [string]: any }
+					} :: any
 				)
 			)
 			:header("Content-Type", "application/json")

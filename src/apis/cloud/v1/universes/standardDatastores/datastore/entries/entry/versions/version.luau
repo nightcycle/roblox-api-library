@@ -47,7 +47,7 @@ function Util.get(
 						entryKey = entryKey,
 						scope = scope:unwrapOr("global"),
 						versionId = versionId,
-					}
+					} :: any
 				)
 			)
 			:header("Content-Type", "application/json")
