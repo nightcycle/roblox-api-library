@@ -24,7 +24,7 @@ type ContentType = reqwest.ContentType
 -- Constants
 
 return {
-	fromAPIKey = function()
+	fromAPIKey = function(): reqwest.Client
 		local keyOpt: Option<luneUtil.CompatSecret> = luneUtil.Secrets["RBX_OPEN_CLOUD_API_KEY"]
 		local key = keyOpt:expect(
 			`"RBX_OPEN_CLOUD_API_KEY" secret not found {if luneUtil.IS_RBX_ENV
@@ -37,7 +37,7 @@ return {
 
 		return builder:build()
 	end,
-	fromCookie = function()
+	fromCookie = function(): reqwest.Client
 		local cookieOpt: Option<luneUtil.CompatSecret> = luneUtil.Secrets["ROBLOSECURITY"]
 		local cookie = cookieOpt:expect(
 			`"ROBLOSECURITY" secret not found {if luneUtil.IS_RBX_ENV

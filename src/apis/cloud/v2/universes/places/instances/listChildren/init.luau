@@ -9,10 +9,9 @@ local vecDeque = require("@pkg/@nightcycle/vec-deque")
 local err = require("@pkg/@nightcycle/error")
 local reqwest = require("@pkg/@nightcycle/reqwest")
 -- Modules
-local client = require("../../../../../../client")
-local operations = require("../../operations")
+local client = require("../../../../../../../client")
 -- Constants
-local CONSTANTS = require("../../../../../../CONSTANTS")
+local CONSTANTS = require("../../../../../../../CONSTANTS")
 -- Types
 type Result<V, E> = result.Result<V, E>
 type Option<V> = option.Option<V>
@@ -25,39 +24,46 @@ type VecDeque<V> = vecDeque.VecDeque<V>
 type Error<V, B> = err.Error<V, B>
 type Response<B> = reqwest.Response<B>
 
--- Private Functions
+export type Operation = {
+	done: boolean,
+	path: string,
+}
 
+-- Constants
+local ROOT_INST_ID = "root"
+
+-- Private Functions
 -- Class
 local Util = {}
 
-Util.rollback = require("./rollback")
-Util.version = require("./version")
 function Util.get(
-	assetId: number,
+	universeId: number,
+	placeId: number,
+	instanceId: Option<string>,
 	maxPageSize: Option<number>,
 	pageToken: Option<string>
-): Future<Result<{
-	assetVersions: { operations.Object },
-	pageToken: Option<string>,
-}, Response<unknown>>>
+): Future<Result<Operation, Response<unknown>>>
 	return future.from(function()
 		return client
 			.fromAPIKey()
-			:get(reqwest.Url.from(CONSTANTS.OPEN_CLOUD_BASE_URL .. `/assets/v1/assets/{assetId}/versions`, {
-				maxPageSize = maxPageSize:asNullable() :: any,
-				pageToken = pageToken:asNullable(),
-			}))
+			:get(
+				reqwest.Url.from(
+					CONSTANTS.OPEN_CLOUD_BASE_URL
+						.. `/cloud/v2/universes/{universeId}/places/{placeId}/instances/{instanceId:unwrapOr(
+							ROOT_INST_ID
+						)}:listChildren`,
+					{
+						maxPageSize = maxPageSize:asNullable() :: any,
+						pageToken = pageToken:asNullable(),
+					}
+				)
+			)
+			:header("Content-Type", "application/json")
 			:build()
 			:send()
 			:await()
 			:match(function(ok)
-				local data = ok:json():unwrap()
-				return result.ok({
-					assetVersions = data["assetVersions"],
-					nextPageCursor = if data["nextPageToken"] and data["nextPageToken"]:len() > 0
-						then option.some(data["nextPageToken"])
-						else option.none(),
-				})
+				return result.ok(ok:json():unwrap())
 			end, function(e)
 				return result.err(e)
 			end)
