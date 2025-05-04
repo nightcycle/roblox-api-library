@@ -156,7 +156,7 @@ function Util.patch(
 	local body = reqwest.Body.fromForm(fields:freeze(), files:freeze(), option.none())
 	local form = body:asForm():unwrap()
 
-	return future.from(function(): any
+	return future.from(function()
 		local request = client
 			.fromAPIKey()
 			:patch(reqwest.Url.from(CONSTANTS.OPEN_CLOUD_BASE_URL .. `/assets/v1/assets/{assetId}`, {

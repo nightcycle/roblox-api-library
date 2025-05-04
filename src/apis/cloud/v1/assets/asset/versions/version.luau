@@ -34,7 +34,7 @@ function Util.get(
 	assetId: number,
 	versionNumber: number
 ): Future<Result<operations.Object, Response<unknown>>>
-	return future.from(function(): any
+	return future.from(function()
 		return client
 			.fromAPIKey()
 			:get(

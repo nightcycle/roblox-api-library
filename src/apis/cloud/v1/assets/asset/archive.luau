@@ -32,7 +32,7 @@ type Response<B> = reqwest.Response<B>
 local Util = {}
 
 function Util.post(assetId: number): Future<Result<operations.Object, Response<unknown>>>
-	return future.from(function(): any
+	return future.from(function()
 		return client
 			.fromAPIKey()
 			:post(reqwest.Url.from(CONSTANTS.OPEN_CLOUD_BASE_URL .. `/assets/v1/assets/{assetId}:archive`))
