@@ -122,8 +122,8 @@ function Util.patch(
 			previews = previews:match(function(pVec): { operations.PreviewData }?
 				table.insert(updateMask, "previews")
 				local out = {}
-				pVec:forEach(function(v)
-					table.insert(out, v)
+				pVec:forEach(function(pv)
+					table.insert(out, pv)
 				end)
 				return out
 			end, function()
@@ -131,10 +131,10 @@ function Util.patch(
 			end),
 		}
 		socialLinks:inspect(function(links)
-			for k, v in pairs(links) do
-				if v then
+			for k, lv in pairs(links) do
+				if lv then
 					table.insert(updateMask, k)
-					request[k] = v
+					request[k] = lv
 				end
 			end
 		end)
