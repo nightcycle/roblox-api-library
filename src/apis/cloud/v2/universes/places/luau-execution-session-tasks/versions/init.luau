@@ -32,13 +32,6 @@ export type LuauTaskErrorState =
 	| "OUTPUT_SIZE_LIMIT_EXCEEDED"
 	| "INTERNAL_ERROR"
 
-type LuauExecutionOutput<V> = {
-	results: { V },
-}
-type ErrorResponse<V> = {
-	code: V,
-	message: string,
-}
 type BaseLuauExecutionTask = {
 	path: string,
 	createTime: luneUtil.CompatDateTime?,
@@ -48,20 +41,26 @@ type BaseLuauExecutionTask = {
 	state: LuauTaskState,
 	script: string?,
 }
-type OkLuauExecutionTask<V> = BaseLuauExecutionTask & {
-	output: LuauExecutionOutput<V>?,
+export type OkLuauExecutionTask = BaseLuauExecutionTask & {
+	done: boolean,
+	output: {
+		results: { unknown },
+	}?,
 }
-type ErrLuauExecutionTask = BaseLuauExecutionTask & {
-	error: ErrorResponse<LuauTaskErrorState>,
+export type ErrLuauExecutionTask = BaseLuauExecutionTask & {
+	done: true,
+	error: {
+		code: LuauTaskErrorState,
+		message: string,
+	},
 }
 
-export type LuauExecutionTask<V> = OkLuauExecutionTask<V> | ErrLuauExecutionTask
+export type LuauExecutionTask = OkLuauExecutionTask | ErrLuauExecutionTask
 
 -- Constants
 
 -- Private Functions
 function parseBaseResponse(jsonResponse: { [string]: unknown? }): BaseLuauExecutionTask
-	print(err.displayAsJson(jsonResponse, 5))
 	local path = jsonResponse["path"]
 	assert(typeof(path) == "string", "Path is not a string")
 	local createTimeStr = jsonResponse["createTime"]
@@ -85,6 +84,7 @@ function parseBaseResponse(jsonResponse: { [string]: unknown? }): BaseLuauExecut
 	assert(typeof(scriptStr) == "string", "Script is not a string")
 
 	return {
+		done = state == "COMPLETE" or state == "FAILED" or state == "CANCELLED",
 		path = path,
 		createTime = createTime,
 		updateTime = updateTime,
@@ -95,7 +95,7 @@ function parseBaseResponse(jsonResponse: { [string]: unknown? }): BaseLuauExecut
 	}
 end
 
-function parseResponse<V>(response: Response<any>): Result<OkLuauExecutionTask<V>, ErrLuauExecutionTask>
+function parseResponse<V>(response: Response<any>): Result<OkLuauExecutionTask, ErrLuauExecutionTask>
 	local json: { [string]: unknown? } = response:json():unwrap() :: any
 	if json["error"] then
 		local errTask = parseBaseResponse(json) :: ErrLuauExecutionTask
@@ -105,15 +105,14 @@ function parseResponse<V>(response: Response<any>): Result<OkLuauExecutionTask<V
 		assert(typeof(code) == "string", "error code is not a string")
 		local message = eField["message"]
 		assert(typeof(message) == "string", "error message is not a string")
-		local errResponse: ErrorResponse<LuauTaskErrorState> = {
+		local errResponse = {
 			code = code :: LuauTaskErrorState,
 			message = message,
 		}
 		errTask["error"] = errResponse
-		return result.err(errTask :: any)
+		return result.err(errTask)
 	else
-		local okTask = parseBaseResponse(json) :: OkLuauExecutionTask<V>
-
+		local okTask = parseBaseResponse(json) :: OkLuauExecutionTask
 		if json["output"] ~= nil then
 			local output: { [string]: unknown? } = json["output"] :: any
 			assert(typeof(output) == "table", "output is not a table")
@@ -126,21 +125,23 @@ function parseResponse<V>(response: Response<any>): Result<OkLuauExecutionTask<V
 			okTask.output = nil
 		end
 
-		return result.ok(okTask :: any)
+		return result.ok(okTask)
 	end
 end
 
 -- Class
-local LuauExecutionUtil = {}
+local Util = {}
 
-function LuauExecutionUtil.post<V>(
+Util._parseResponse = parseResponse
+
+function Util.post<V>(
 	universeId: number,
 	placeId: number,
 	versionNumber: number,
 	content: string,
-	timeout: number
-): Future<Result<LuauExecutionTask<V>, Response<unknown>>>
-	return future.from(function(): any
+	timeout: Option<number>
+): Future<Result<Result<OkLuauExecutionTask, ErrLuauExecutionTask>, Response<unknown>>>
+	return future.from(function()
 		return client
 			.fromAPIKey()
 			:post(
@@ -149,7 +150,11 @@ function LuauExecutionUtil.post<V>(
 			)
 			:body(reqwest.Body.fromJson({
 				script = content,
-				timeout = `{timeout}s`,
+				timeout = timeout:match(function(v): string?
+					return `{v}s`
+				end, function()
+					return nil
+				end),
 			}))
 			:header("Content-Type", "application/json")
 			:build()
@@ -163,23 +168,4 @@ function LuauExecutionUtil.post<V>(
 	end)
 end
 
-function LuauExecutionUtil.get<V>(
-	okResponsePath: string
-): Future<Result<LuauExecutionTask<V>, Response<unknown>>>
-	return future.from(function(): any
-		return client
-			.fromAPIKey()
-			:get(CONSTANTS.OPEN_CLOUD_BASE_URL .. `/cloud/v2/{okResponsePath}`)
-			:header("Content-Type", "application/json")
-			:build()
-			:send()
-			:await()
-			:match(function(response)
-				return result.ok(parseResponse(response))
-			end, function(response)
-				return result.err(response)
-			end)
-	end)
-end
-
-return LuauExecutionUtil
+return Util
