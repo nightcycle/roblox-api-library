@@ -83,8 +83,9 @@ jobs:
           repo_name="${{needs.get_published_release.outputs.repo_name}}"
           repo_desc=${{needs.get_published_release.outputs.repo_desc}}
           goal_version_str="${{needs.get_published_release.outputs.tag_name}}"
-
-          sh scripts/release/wally.sh "$repo_owner" "rbx-api-${{env.PACKAGE}}" "$repo_desc" "$goal_version_str" "${{env.ROJO_CONFIG}}"
+          package_path_name="${{env.PACKAGE}}"
+          package_path_name="${package_path_name,,}"
+          sh scripts/release/wally.sh "$repo_owner" "rbx-api-$package_path_name" "$repo_desc" "$goal_version_str" "${{env.ROJO_CONFIG}}"
 
       - name: Upload ${{env.RBXL_FILE}} file to release
         uses: actions/upload-release-asset@v1
@@ -137,8 +138,9 @@ jobs:
           repo_name="${{needs.get_published_release.outputs.repo_name}}"
           repo_desc=${{needs.get_published_release.outputs.repo_desc}}
           goal_version_str="${{needs.get_published_release.outputs.tag_name}}"
-
-          sh scripts/release/npm.sh "$repo_owner" "rbx-api-${{env.PACKAGE}}" "$repo_desc" "$goal_version_str" "${{env.ROJO_CONFIG}}"
+          package_path_name="${{env.PACKAGE}}"
+          package_path_name="${package_path_name,,}"
+          sh scripts/release/npm.sh "$repo_owner" "rbx-api-$package_path_name" "$repo_desc" "$goal_version_str" "${{env.ROJO_CONFIG}}"
 
       - name: Enable corepack
         run: corepack enable

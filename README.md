@@ -16,10 +16,10 @@ This will change over time, but the legacy ones probably will never be fully por
 
 Default type complexity errors make it impractical to publish this all as a single package. To keep type-safety it is published as sub-packages. They can be found on wally / npm.
 
-- `nightcycle/rbx-api-cloud-v1-universes-standardDatastores`
+- `nightcycle/rbx-api-cloud-v1-universes-standarddatastores`
 - `nightcycle/rbx-api-cloud-v1-universes-places`
-- `nightcycle/rbx-api-cloud-v1-universes-orderedDatastores`
-- `nightcycle/rbx-api-cloud-v1-universes-messagingService`
+- `nightcycle/rbx-api-cloud-v1-universes-ordereddatastores`
+- `nightcycle/rbx-api-cloud-v1-universes-messagingservice`
 - `nightcycle/rbx-api-cloud-v1-assets`
 - `nightcycle/rbx-api-cloud-v2-universes`
 - `nightcycle/rbx-api-cloud-v2-universes-places`
