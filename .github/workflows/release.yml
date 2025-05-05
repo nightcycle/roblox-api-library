@@ -38,8 +38,9 @@ jobs:
           repo_name=${{ github.repository }}
           forward_repo_pattern="${repo_owner_name}/"
           empty_str=""
-          repo_name="rbx-api-${{env.PACKAGE}}"
-          echo "repo_name=$repo_name" >> $GITHUB_OUTPUT
+          repo_name="${repo_name/${forward_repo_pattern}/${empty_str}}"
+          pub_repo_name="rbx-api-${{env.PACKAGE}}"
+          echo "repo_name=$pub_repo_name" >> $GITHUB_OUTPUT
 
           # Use the GitHub API to fetch the repository description
           description_prefix="\"description\":"
@@ -48,7 +49,7 @@ jobs:
           desc=$(echo "$desc" | grep -F "$description_prefix")
           desc="${desc/${description_prefix}/${empty_str}}"
           repo_desc=$(echo "$desc" | grep -o '"[^"]*"')
-          echo "::set-output name=repo_desc::$repo_desc"
+          echo "repo_desc=$repo_desc" >> $GITHUB_OUTPUT
 
   publish_to_wally:
     needs: get_published_release
