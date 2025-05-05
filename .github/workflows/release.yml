@@ -90,7 +90,7 @@ jobs:
         with:
           upload_url: ${{ needs.get_published_release.outputs.upload_url }}
           asset_path: ${{env.RBXL_FILE}}
-          asset_name: Package.rbxl
+          asset_name: ${{env.PACKAGE}}.rbxl
           asset_content_type: application/octet-stream
 
       - name: publish package
