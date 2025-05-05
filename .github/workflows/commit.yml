@@ -11,7 +11,10 @@ jobs:
     strategy:
       matrix:
         package: [
-          "cloud-v1-universes",
+          "cloud-v1-universes-standardDatastores",
+          "cloud-v1-universes-places",
+          "cloud-v1-universes-orderedDatastores",
+          "cloud-v1-universes-messagingService",
           "cloud-v1-assets",
           "cloud-v2-universes",
           "cloud-v2-universes-places",

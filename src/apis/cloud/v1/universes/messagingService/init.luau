@@ -9,9 +9,9 @@ local vecDeque = require("@pkg/@nightcycle/vec-deque")
 local err = require("@pkg/@nightcycle/error")
 local reqwest = require("@pkg/@nightcycle/reqwest")
 -- Modules
-local client = require("../../../../client")
+local client = require("../../../../../client")
 -- Constants
-local CONSTANTS = require("../../../../CONSTANTS")
+local CONSTANTS = require("../../../../../CONSTANTS")
 -- Types
 type Result<V, E> = result.Result<V, E>
 type Option<V> = option.Option<V>
