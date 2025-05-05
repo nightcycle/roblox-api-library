@@ -13,6 +13,7 @@ jobs:
           "cloud-v1-universes",
           "cloud-v1-assets",
           "cloud-v2-universes",
+          "cloud-v2-universes-places",
         ]
     env:
       PACKAGE: ${{ matrix.package }}

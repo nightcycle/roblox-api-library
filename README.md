@@ -7,7 +7,7 @@ An effort to port the official Roblox web apis on both npm and wally.
 There are many APIs, and frankly I will never use most of them - especially on the legacy side. Here's a summary:
 
 - Open Cloud V1: all of em!
-- Open Cloud V2: all of the universe ones
+- Open Cloud V2: mostly universe/place ones
 - Legacy: nothing!
 
 This will change over time, but the legacy ones probably will never be fully ported.
@@ -19,6 +19,7 @@ Default type complexity errors make it impractical to publish this all as a sing
 - `nightcycle/rbx-api-cloud-v1-universes`
 - `nightcycle/rbx-api-cloud-v1-assets`
 - `nightcycle/rbx-api-cloud-v2-universes`
+- `nightcycle/rbx-api-cloud-v2-universes-places`
 
 As trees increase / decrease in complexity + there are improvements in the luau type engine, expect the specific splitting to change. Ideally all of this would be in one package, but we're not going to sacrifice type safety to do it.
 

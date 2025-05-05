@@ -7,11 +7,11 @@ local err = require("@pkg/@nightcycle/error")
 local option = require("@pkg/@nightcycle/option")
 -- Modules
 local assets = require("../src/apis/cloud/v1/assets")
-local assetsOperations = require("../src/apis/cloud/v1/assets/operations")
-local assetsAsset = require("../src/apis/cloud/v1/assets/asset")
-local assetsAssetArchive = require("../src/apis/cloud/v1/assets/asset/archive")
-local restoredAssetArchive = require("../src/apis/cloud/v1/assets/asset/restore")
-local assetsAssetVersions = require("../src/apis/cloud/v1/assets/asset/versions")
+local assetsOperations = assets.operations
+local assetsAsset = assets.asset
+local assetsAssetArchive = assetsAsset.archive
+local assetsAssetRestore = assetsAsset.restore
+local assetsAssetVersions = assetsAsset.versions
 
 -- Types
 -- Constants
@@ -101,7 +101,7 @@ do
 end
 
 do
-	local restoredAsset = restoredAssetArchive.post(assetId:expect(`assetId is not set`)):await():unwrap()
+	local restoredAsset = assetsAssetRestore.post(assetId:expect(`assetId is not set`)):await():unwrap()
 	print(`restoring asset: {err.displayAsJson(restoredAsset)}`)
 end
 

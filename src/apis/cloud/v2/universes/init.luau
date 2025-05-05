@@ -111,7 +111,6 @@ end
 
 -- Class
 local Util = {}
-Util.places = require("./places")
 Util.publishMessage = require("./publishMessage")
 Util.restartServers = require("./restartServers")
 
