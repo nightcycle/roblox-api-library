@@ -28,19 +28,19 @@ jobs:
       - name: Set Release Info
         id: release_info
         run: |
-          echo "tag_name=${{ github.event.release.tag_name }}" >> $GITHUB_OUTPUT
-          echo "release_id=${{ github.event.release.id }}" >> $GITHUB_OUTPUT
-          echo "upload_url=${{ github.event.release.upload_url }}" >> $GITHUB_OUTPUT
+          echo "::set-output name=tag_name::${{ github.event.release.tag_name }}"
+          echo "::set-output name=release_id::${{ github.event.release.id }}"
+          echo "::set-output name=upload_url::${{ github.event.release.upload_url }}"
 
           repo_owner_name=${{ github.repository_owner }}
-          echo "repo_owner_name=$repo_owner_name" >> $GITHUB_OUTPUT
+          echo "::set-output name=repo_owner_name::$repo_owner_name"
 
           repo_name=${{ github.repository }}
           forward_repo_pattern="${repo_owner_name}/"
           empty_str=""
           repo_name="${repo_name/${forward_repo_pattern}/${empty_str}}"
-          pub_repo_name="rbx-api-${{env.PACKAGE}}"
-          echo "repo_name=$pub_repo_name" >> $GITHUB_OUTPUT
+          pub_repo_name="rbx-web-api-${{env.PACKAGE}}"
+          echo "::set-output name=repo_name::$pub_repo_name"
 
           # Use the GitHub API to fetch the repository description
           description_prefix="\"description\":"
@@ -49,7 +49,7 @@ jobs:
           desc=$(echo "$desc" | grep -F "$description_prefix")
           desc="${desc/${description_prefix}/${empty_str}}"
           repo_desc=$(echo "$desc" | grep -o '"[^"]*"')
-          echo "repo_desc=$repo_desc" >> $GITHUB_OUTPUT
+          echo "::set-output name=repo_desc::$repo_desc"
 
   publish_to_wally:
     needs: get_published_release
