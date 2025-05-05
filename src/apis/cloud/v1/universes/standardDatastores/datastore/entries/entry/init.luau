@@ -39,6 +39,9 @@ type DataStoreEntryValue =
 -- Class
 local Util = {}
 
+Util.increment = require("./increment")
+Util.versions = require("./versions")
+
 function Util.get(
 	universeId: number,
 	datastoreName: string,

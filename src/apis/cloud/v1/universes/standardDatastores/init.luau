@@ -26,6 +26,7 @@ type OkBody = {
 
 -- Class
 local Util = {}
+Util.datastore = require("./datastore")
 
 -- lists the datastores
 function Util.get(
