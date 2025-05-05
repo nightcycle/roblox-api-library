@@ -38,6 +38,7 @@ type DataStoreEntryValue =
 
 -- Class
 local Util = {}
+Util.entry = require("./entry")
 
 -- lists the entries
 function Util.get(
