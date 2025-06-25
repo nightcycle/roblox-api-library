@@ -14,13 +14,13 @@
 	},
 	"dependencies": {
 		"@nightcycle/error": "^0",
-		"@nightcycle/future": "^0",
-		"@nightcycle/result": "^0",
-		"@nightcycle/option": "^0",
+		"@nightcycle/future": "^1",
+		"@nightcycle/result": "^1",
+		"@nightcycle/option": "^1",
 		"@nightcycle/hash-map": "^0",
 		"@nightcycle/vec-deque": "^0",
 		"@nightcycle/vec": "^0",
-		"@nightcycle/lune-util": "0.7",
+		"@nightcycle/lune-util": "^0",
 		"@nightcycle/serde-json": "^0",
 		"@nightcycle/reqwest": "^0",
 		"@nightcycle/hashlib": "^1"
